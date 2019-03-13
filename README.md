@@ -47,3 +47,8 @@ All things driving swarm with global issue tracker and goals.
   * Formation Behaviours
   * Foraging (Indian Cross)
   * Collective Search (Minimize Distance to Cable Car)
+
+## Stucture of the Repository
+
+* **All** packages required for the Driving Swarm robot should be included as submodules
+* TODO: Make a tutorial on how to include the set up the files to get a worgking robot
