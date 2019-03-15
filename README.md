@@ -27,8 +27,9 @@ All things driving swarm with global issue tracker and goals.
   
 * Simulation
   * Multiple robots in the same environment
+  * Possibly not with multi-master ros but different prefixes per robot conrtoller
   * Same codebase as the real robots
-  * Possible frameworks Gazebo, V-Rep, Argos
+  * Possible frameworks Gazebo (V-Rep, Argos)
   
 * Unified World Representation
   * Have one world reresentation that works for the swarm
