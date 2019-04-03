@@ -23,7 +23,7 @@ All things driving swarm with global issue tracker and goals.
   * Nav-Stack for robot navigation
   * Basic behaviour with random movement and collision avoidance
   * Central point of control for the swarm (starting and stopping the robots, task distribution)
-  
+  * Optional Goal- Integrate Localisation
   
 * Simulation
   * Multiple robots in the same environment
