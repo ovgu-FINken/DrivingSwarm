@@ -17,7 +17,7 @@ All things driving swarm with global issue tracker and goals.
  
 ## Milestones
 
-* Basic Architecture
+* Basic Architecture (work in progress)
   * Multi-Master ROS
   * ROS-Node controlling the behaviour
   * Nav-Stack for robot navigation
