@@ -2,7 +2,7 @@
 All things driving swarm with global issue tracker and goals.
 
 ## Goals
-* Research swarm-robotic behaviour with advanced robots
+* Research swarm-robotic behaviour with robots capable of mapping
 * Swarm Applications
   * Foraging
   * Collective Search
@@ -10,6 +10,7 @@ All things driving swarm with global issue tracker and goals.
 * Robotic Topics
   * World Representation in the Context of Swarm Robotics
   * Collective Trajectory Planning
+  * Localisation in Robotic Swarms
 * Swarm Topics
   * Integration of long term behaviour and short term planning
   * Integration of SI algorithms in robotics applications
@@ -25,7 +26,7 @@ All things driving swarm with global issue tracker and goals.
   * Central point of control for the swarm (starting and stopping the robots, task distribution)
   * Optional Goal- Integrate Localisation
   
-* Simulation
+* Simulation (currently working with Gazebo, slow for many robots)
   * Multiple robots in the same environment
   * Possibly not with multi-master ros but different prefixes per robot conrtoller
   * Same codebase as the real robots
@@ -47,7 +48,7 @@ All things driving swarm with global issue tracker and goals.
 * Implement Collective Behaviour
   * Formation Behaviours
   * Foraging (Indian Cross)
-  * Collective Search (Minimize Distance to Cable Car)
+  * Collective Search (e.g. Minimize Distance to Cable Car)
 
 ## Stucture of the Repository
 
