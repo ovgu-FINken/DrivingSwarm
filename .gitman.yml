@@ -1,0 +1,29 @@
+location: .gitman
+sources:
+- name: hls_lfcd_lds_driver
+  repo: https://github.com/ROBOTIS-GIT/hls_lfcd_lds_driver.git
+  rev: 4684a80cbac85b94bd7578898c78b9e697c1be9f
+  link: src/hls_lfcd_lds_driver
+  #  scripts:
+  #- git submodule update --init --recursive
+
+
+- name: openslam_gmapping
+  repo: https://github.com/ros-perception/openslam_gmapping
+  rev: c716f0192131029b31a49554f8c11353d29819a5
+  link: src/openslam_gmapping
+
+- name: slam_gmapping
+  repo: https://github.com/ros-perception/slam_gmapping
+  rev: 5a707e079364ab9f5349c72310f31bfed4a6c834
+  link: src/slam_gmapping
+
+- name: turtlebot3
+  repo: https://github.com/ROBOTIS-GIT/turtlebot3.git
+  rev: 4da5676fab45703e1ee5ac8b675d7f447c13489f
+  link: src/turtlebot3
+
+- name: turtlebot3_msgs
+  repo: https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git
+  rev: 036a68972d967c813dad84a4dfcee52f425e7f40
+  link: src/turtlebot3_msgs
