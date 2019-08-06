@@ -50,3 +50,9 @@ qtcreator-*
 # Catkin custom files
 CATKIN_IGNORE
 .catkin_tools/
+.gitman/
+src/hls_lfcd_lds_driver
+src/openslam_gmapping
+src/slam_gmapping
+src/turtlebot3
+src/turtlebot3_msgs
