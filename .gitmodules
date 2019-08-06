@@ -13,3 +13,6 @@
 [submodule "src/openslam_gmapping"]
 	path = src/openslam_gmapping
 	url = https://github.com/ros-perception/openslam_gmapping
+[submodule "src/driving_swarm_positioning"]
+	path = src/driving_swarm_positioning
+	url = https://github.com/ovgu-FINken/driving_swarm_positioning.git

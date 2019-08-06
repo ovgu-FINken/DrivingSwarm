@@ -1,0 +1,10 @@
+#goal / behaviour to execute
+string name
+---
+#result / succeeded/failed
+bool success
+string result_msg
+---
+#feedback / progress
+int percentage
+string status

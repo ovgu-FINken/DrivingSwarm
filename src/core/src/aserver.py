@@ -1,13 +1,9 @@
 #!/usr/bin/env python
-# TODO: send commands to topic
-# Create python script for cli to communicate with this script
 
-# USE ACTIONLIBS i guess
-#
-
-# Communicate via subprocesses
-# Choose mode (File vs CLI vs Hybrid)
 import rospy
+import actionlib
+
+from core.msg import 
 
 class Sender:
     def __init__(self):
