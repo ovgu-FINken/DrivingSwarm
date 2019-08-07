@@ -32,3 +32,8 @@ sources:
   repo: https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
   rev: master
   link: src/turtlebot3_simulations
+
+- name: uncertainty_grid
+  repo: git@github.com:ovgu-FINken/tracking_uncertainty_grid.git
+  rev: master
+  link: src/tracking_uncertainty_grid
