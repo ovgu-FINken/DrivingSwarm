@@ -19,11 +19,16 @@ sources:
   link: src/slam_gmapping
 
 - name: turtlebot3
-  repo: https://github.com/ROBOTIS-GIT/turtlebot3.git
-  rev: 4da5676fab45703e1ee5ac8b675d7f447c13489f
+  repo: git@github.com:ovgu-FINken/turtlebot3.git
+  rev: master
   link: src/turtlebot3
 
 - name: turtlebot3_msgs
   repo: https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git
   rev: 036a68972d967c813dad84a4dfcee52f425e7f40
   link: src/turtlebot3_msgs
+
+- name: turtlebot3_simulations
+  repo: https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
+  rev: master
+  link: src/turtlebot3_simulations
