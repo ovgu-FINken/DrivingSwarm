@@ -1,0 +1,11 @@
+#goal / behaviour to execute
+string goal_name
+string goal_call
+---
+#result / succeeded/failed
+bool res_success
+string res_msg
+---
+#feedback / progress
+uint8 prog_perc
+string prog_status

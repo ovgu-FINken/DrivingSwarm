@@ -7,12 +7,6 @@
 [submodule "hls_lfcd_lds_driver"]
 	path = src/hls_lfcd_lds_driver
 	url = https://github.com/ROBOTIS-GIT/hls_lfcd_lds_driver.git
-[submodule "src/slam_gmapping"]
-	path = src/slam_gmapping
-	url = https://github.com/ros-perception/slam_gmapping
-[submodule "src/openslam_gmapping"]
-	path = src/openslam_gmapping
-	url = https://github.com/ros-perception/openslam_gmapping
 [submodule "src/driving_swarm_positioning"]
 	path = src/driving_swarm_positioning
 	url = https://github.com/ovgu-FINken/driving_swarm_positioning.git
