@@ -32,12 +32,13 @@ class BehaviourAServer:
         actionfile = open('../cfg/behaviour_list.yaml', 'r')
         self.actions = yaml.load(actionfile)
         actionfile.close()
-        
+
+        # timeout for looking for service of launched node
         self.srv_timeout = rospy.get_param('~srv_timeout',60)
-        print(rospy.get_namespace())
-        # new simpleactionserve
+
+        # new simpleactionserver
         self.a_server=actionlib.SimpleActionServer(rospy.get_namespace()+'behaviour', BehaviourAction, self.execute, False)
-        rospy.loginfo('Starting behaviour_aserver')
+        rospy.loginfo('[behaviour_aserver]: starting with timeout '+str(self.srv_timeout))
         self.a_server.start()
         
     def execute(self, goal):
@@ -72,7 +73,7 @@ class BehaviourAServer:
     
         # TODO: implement start, stop and pause request (future)
 
-        rate = rospy.Rate(2)    
+        rate = rospy.Rate(1)    
             
         while True:
             # preemption request by a_client
@@ -82,9 +83,14 @@ class BehaviourAServer:
                 parent.stop()
                 return
 
-            # service node status returned must be (int, string)
-            status_perc, status_msg = behav_service.get_status()
-
+            # service file must be of type
+            # ---
+            # uint8 perc
+            # string msg
+            status_answer = behav_service.get_status()
+            status_perc = status_answer.perc
+            status_msg = status_answer.msg
+            
             # service node has encountered an error
             if status_msg[:5] == 'ERROR':
                 FAILURE.result.res_msg = status_msg

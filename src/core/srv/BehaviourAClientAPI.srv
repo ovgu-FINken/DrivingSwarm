@@ -1,0 +1,5 @@
+uint8 req_type
+string req_args
+---
+uint8 answ_type
+string answ_msg
