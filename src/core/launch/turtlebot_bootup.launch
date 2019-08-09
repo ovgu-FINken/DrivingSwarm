@@ -5,9 +5,8 @@
 
     <group ns="$(env ROS_HOSTNAME)">
 
-        <include ns="$(env ROS_HOSTNAME)" file="$(find turtlebot3_bringup)/launch/turtlebot3_robot.launch"/>
-
-        <node ns="$(env ROS_HOSTNAME)" name="behaviour_aserver" pkg="core" type="aserver.py" args="srv_timeout:=60" respawn="true"/>
+        <include file="$(find turtlebot3_bringup)/launch/turtlebot3_robot.launch"/>
+        <node name="behaviour_aserver" pkg="core" type="aserver.py" args="srv_timeout:=60" respawn="true"/>
 
     </group>
 </launch>

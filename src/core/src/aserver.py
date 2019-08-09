@@ -32,7 +32,7 @@ class BehaviourAServer:
     def __init__(self):
         # open behaviour_list which contains all goals and the respective calls
         filedir = os.path.dirname(__file__)
-        actionfile = open(os.path.join(filedir, '/cfg/behaviour_list.yaml'), 'r')
+        actionfile = open(os.path.join(filedir, '../cfg/behaviour_list.yaml'), 'r')
         self.actions = yaml.load(actionfile)
         actionfile.close()
 
