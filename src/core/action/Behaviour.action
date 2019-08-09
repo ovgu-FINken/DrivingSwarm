@@ -3,9 +3,11 @@ string goal_name
 string goal_call
 ---
 #result / succeeded/failed
+uint8 ns
 bool res_success
 string res_msg
 ---
 #feedback / progress
+uint8 ns
 uint8 prog_perc
 string prog_status

@@ -99,11 +99,17 @@ find_package(catkin REQUIRED)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 
+
+
 find_package(catkin REQUIRED genmsg actionlib_msgs)
+
+# actionlib for aserver and aclient
 add_action_files(DIRECTORY action FILES Behaviour.action)
+
+# service for aclient
+add_service_files(DIRECTORY srv FILES BehaviourAPI.srv)
+
 generate_messages(DEPENDENCIES actionlib_msgs)
-
-
 
 catkin_package(
 #  INCLUDE_DIRS include
