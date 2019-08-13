@@ -37,3 +37,8 @@ sources:
   repo: git@github.com:ovgu-FINken/tracking_uncertainty_grid.git
   rev: master
   link: src/tracking_uncertainty_grid
+
+- name: ranging
+  repo: git@github.com:ovgu-FINken/driving_swarm_positioning
+  rev: master
+  link: src/driving_swarm_positioning
