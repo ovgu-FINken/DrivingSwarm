@@ -42,3 +42,8 @@ sources:
   repo: git@github.com:ovgu-FINken/driving_swarm_positioning
   rev: basti
   link: src/driving_swarm_positioning
+
+- name: pheromones
+  repo: git@github.com:ovgu-FINken/driving_swarm_pheromones.git
+  rev: master
+  link: src/driving_swarm_pheromones
