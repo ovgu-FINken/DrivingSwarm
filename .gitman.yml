@@ -40,5 +40,5 @@ sources:
 
 - name: ranging
   repo: git@github.com:ovgu-FINken/driving_swarm_positioning
-  rev: master
+  rev: basti
   link: src/driving_swarm_positioning
