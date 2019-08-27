@@ -12,3 +12,5 @@ NUM=$((++NUM))
 tmux new-window -t turtlebots -n "teleop"
 tmux send-keys -t turtlebots:$NUM "roslaunch turtlebot3_teleop turtlebot3_teleop_key.launch multi_robot_name:=$ROS_HOSTNAME" C-m
 NUM=$((++NUM))
+
+tmux attach
