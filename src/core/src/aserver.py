@@ -14,20 +14,22 @@ from core.msg import BehaviourAction, BehaviourActionFeedback, BehaviourActionRe
 SUCCEEDED = BehaviourActionResult()
 SUCCEEDED.result.res_success = True
 SUCCEEDED.result.res_msg = 'no problems here'
+SUCCEEDED.result.ns = rospy.get_namespace()
 
 FAILURE = BehaviourActionResult()
 FAILURE.result.res_success = False
 FAILURE.result.res_msg = 'insert your error here'
+FAILURE.result.ns = rospy.get_namespace()
 
 PREEMPT = BehaviourActionResult()
 PREEMPT.result.res_success = False
 PREEMPT.result.res_msg = 'goal has been preempted'
+PREEMPT.result.ns = rospy.get_namespace()
 
 PROGRESS = BehaviourActionFeedback()
 PROGRESS.feedback.prog_perc = 0
 PROGRESS.feedback.prog_status = 'default progress'
-
-#TODO: add msg.ns for turtlebot_namespace
+PROGRESS.result.ns = rospy.get_namespace()
 
 class BehaviourAServer:
     def __init__(self):
@@ -98,15 +100,16 @@ class BehaviourAServer:
             status_perc = status_answer.perc
             status_msg = status_answer.msg
             
+            # TODO: document service messages
             # service node has encountered an error
-            if status_msg[:5] == 'ERROR':
-                FAILURE.result.res_msg = status_msg
+            if status_msg[:3] == 'err':
+                FAILURE.result.res_msg = status_msg[3:]
                 self.a_server.set_aborted(FAILURE)
                 parent.stop()
                 return         
             # service node succeeded
-            elif status_msg[:7] == 'SUCCESS':
-                SUCCESS.result.res_msg = status_msg
+            elif status_msg[:3] == 'suc':
+                SUCCESS.result.res_msg = status_msg[3:]
                 self.a_server.set_succeeded(SUCCESS)
                 parent.stop()
                 return
@@ -123,6 +126,6 @@ class BehaviourAServer:
         parent.stop()
 
 if __name__ == '__main__':
-		rospy.init_node('behaviour_aserver')
-		behaviour_aserver = BehaviourAServer()
-		rospy.spin()
+    rospy.init_node('behaviour_aserver')
+    behaviour_aserver = BehaviourAServer()
+    rospy.spin()

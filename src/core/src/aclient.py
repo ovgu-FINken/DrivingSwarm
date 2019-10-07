@@ -21,7 +21,7 @@ class BehaviourAClient:
 
         # start service / load behaviour_flow for sequencing of behaviours
         if self.mode:
-            self.inter_srv = rospy.Service('behaviour_aclient_api', core.srv.BehaviourAPI, self.api_handler )
+            self.inter_srv = rospy.Service(rospy.get_namespace()+'behaviour_aclient_api', core.srv.BehaviourAPI, self.api_handler )
         else:
             # flowfile must be of type (DOUBLE QUOTES ARE IMPORTANT HERE)
             # - ['behaviour_name', "['pkg','launch.file','arg1:=val','arg2:=val', ...]"]
@@ -38,8 +38,9 @@ class BehaviourAClient:
 
         # initialise on all servers (turtlebots)
         # TODO
-        
-            self.a_clients[i] = actionlib.SimpleActionClient(rospy.get_namespace()+'behaviour_ctrl', BehaviourAction)
+            
+            for i, namespace in self.names
+                self.a_clients[i] = actionlib.SimpleActionClient(namespace+'behaviour', BehaviourAction)
 
 
         rospy.loginfo('[behaviour_aclient]: starting with interactive_mode ' + str(mode))
@@ -47,7 +48,9 @@ class BehaviourAClient:
 
         if not self.mode:
             self.flow_handler()
-        
+
+
+# handles behaviour_flow-mode
     def flow_handler(self):
         filedir = os.path.dirname(__file__)
         self.log = open(os.path.join(filedir,'../cfg/flow.log'),'a')
@@ -82,12 +85,15 @@ class BehaviourAClient:
         self.log.write('['+datetime.now().time()+']: ' + ' DONE: ' + succ + result.res_msg)
         self.flow_step += 1
 
+# TODO
+# handler for api-requests
     def api_handler(self, req):
     # 0 = set a new goal (preempt/replace old one)
     # 1 = get feedback on goal
     # 2 = cancel active goal
+    # 3 = try to reconnect bots
     # 3-4 = pause / unpause (in future)
-        answer = ['answ_type':0, 'answ_msg':'default']
+        answer = {'answ_type':0, 'answ_ns':[],'answ_msg':[]}
         # TODO
         if req.req_type == 0:
             # correct yaml is sent by tui (cf flowfile)
@@ -103,7 +109,9 @@ class BehaviourAClient:
     def ap_feedback(self, feedback):
 #TODO
     def api_done(self, result):
-    
+
+
+
 if __name__ == '__main__':
     rospy.init_node('behaviour_aclient')
     behaviour_aclient = BehaviourAClient()

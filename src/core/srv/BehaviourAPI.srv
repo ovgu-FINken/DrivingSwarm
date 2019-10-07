@@ -2,4 +2,5 @@ uint8 req_type
 string req_args
 ---
 uint8 answ_type
-string answ_msg
+string[] answ_ns
+string[] answ_msg
