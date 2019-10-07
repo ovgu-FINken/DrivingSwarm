@@ -83,10 +83,11 @@ class BehaviourAClient:
         self.flow_step += 1
 
     def api_handler(self, req):
-    # 0 = set a new goal (preempt/replace old one)
-    # 1 = get feedback on goal
-    # 2 = cancel active goal
-    # 3-4 = pause / unpause (in future)
+    # 0 = (re)connect to all bots in bot_list.yaml
+    # 1 = set a new goal (preempt/replace old one)
+    # 2 = get feedback on goal
+    # 3 = cancel active goal
+    # 4-5 = pause / unpause (in future)
         answer = ['answ_type':0, 'answ_msg':'default']
         # TODO
         if req.req_type == 0:
