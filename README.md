@@ -19,18 +19,18 @@ All things driving swarm with global issue tracker and goals.
  
 ## Milestones
 
-* Basic Architecture (work in progress)
-  [ ] Multi-Master ROS
-  [ ] ROS-Node controlling the behaviour
-  [x] Nav-Stack for robot navigation
-  [ ] Basic behaviour with random movement and collision avoidance
-  [x] Central point of control for the swarm (starting and stopping the robots, task distribution)
-  [ ] Optional Goal- Integrate Localisation
+- Basic Architecture (work in progress)
+  - [ ] Multi-Master ROS
+  - [ ] ROS-Node controlling the behaviour
+  - [x] Nav-Stack for robot navigation
+  - [ ] Basic behaviour with random movement and collision avoidance
+  - [x] Central point of control for the swarm (starting and stopping the robots, task distribution)
+  - [ ] Optional Goal- Integrate Localisation
   
-* Simulation (currently working with Gazebo, slow for many robots)
-  [x] Multiple robots in the same environment
-  [x] Possibly not with multi-master ros but different prefixes per robot conrtoller
-  [x] Same codebase as the real robots
+- Simulation (currently working with Gazebo, slow for many robots)
+  - [x] Multiple robots in the same environment
+  - [x] Possibly not with multi-master ros but different prefixes per robot conrtoller
+  - [x] Same codebase as the real robots
    
 * Unified World Representation
   * Have one world reresentation that works for the swarm
