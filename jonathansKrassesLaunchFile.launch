@@ -29,6 +29,7 @@
   </include>  
 
   <group ns = "$(arg first_tb3)">
+    <node pkg="tf" type="static_transform_publisher" name="$(anon foo)" args="0 0 0 0 0 0 /world $(arg first_tb3)/map 100"/>
     <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
 
     <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
@@ -40,6 +41,7 @@
   </group>
 
   <group ns = "$(arg second_tb3)">
+    <node pkg="tf" type="static_transform_publisher" name="$(anon foo)" args="0 0 0 0 0 0 /world $(arg second_tb3)/map 100"/>
     <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
 
     <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
@@ -51,6 +53,7 @@
   </group>
 
   <group ns = "$(arg third_tb3)">
+    <node pkg="tf" type="static_transform_publisher" name="$(anon foo)" args="0 0 0 0 0 0 /world $(arg third_tb3)/map 100"/>
     <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
 
     <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
