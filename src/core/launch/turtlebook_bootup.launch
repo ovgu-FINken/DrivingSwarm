@@ -5,7 +5,7 @@
 
     <group ns="$(env ROS_HOSTNAME)">
 
-        <node name="behaviour_aclient" pkg="core" type="aclient.py" args="inter_mode:=False" respawn="true"/>
+        <!--node name="behaviour_aclient" pkg="core" type="aclient.py" args="inter_mode:=False" respawn="true"/-->
         
     </group>
     
