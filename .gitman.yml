@@ -47,3 +47,8 @@ sources:
   repo: git@github.com:ovgu-FINken/driving_swarm_pheromones.git
   rev: master
   link: src/driving_swarm_pheromones
+
+- name: camera
+  repo: git@github.com:jbeckhaus/WhyCon_Ros.git
+  rev: master
+  link: src/WhyCon_Ros
