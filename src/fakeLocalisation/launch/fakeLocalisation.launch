@@ -1,0 +1,5 @@
+  <launch>
+    <node name="fakeLocalisation" pkg="fakeLocalisation" type="fakeLocalisation.py" respawn="false" output="screen" >
+      <param name="botCount" type="int" value="1" />
+    </node>
+ </launch>
