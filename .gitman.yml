@@ -47,3 +47,8 @@ sources:
   repo: git@github.com:ovgu-FINken/driving_swarm_pheromones.git
   rev: master
   link: src/driving_swarm_pheromones
+
+- name: pathplanning
+  repo: git@github.com:ovgu-FINken/multi_robot_path_planning.git
+  rev: master
+  link: src/pathplanning
