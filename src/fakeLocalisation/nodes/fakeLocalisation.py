@@ -35,8 +35,7 @@ def read_tf(count):
     while not rospy.is_shutdown():
         for id in range(0, count):
             try:
-                #(trans, rot) = listener.lookupTransform('/world', '/tb3_' + str(id) + '/odom', rospy.Time(0))
-                pose = tfBuffer.lookup_transform('world', 'tb3_' + str(id) + '/odom', rospy.Time(0))
+                pose = tfBuffer.lookup_transform('loc_system_meta_" + locSystemName', 'tb3_' + str(id) + '/odom', rospy.Time(0))
             except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
                 continue
             create_static_tf("loc_system_meta_" + locSystemName,
@@ -46,10 +45,9 @@ def read_tf(count):
 
 if __name__ == '__main__':
     rospy.init_node('fakeLocalisation')
-
+    botCount = rospy.get_param('~bot_count')
+    print("Bot Count: " + str(botCount))
     create_static_tf("world", "loc_system_meta_" + locSystemName, ((0, 0, 0), (0, 0, 0, 1)))
-    read_tf(1)
-   # tfWorld2locSystem()
-
+    read_tf(botCount)
 
     rospy.spin()
