@@ -156,7 +156,8 @@
     
         <!-- rviz -->
         <group if="$(arg open_rviz)"> 
-            <node pkg="rviz" type="rviz" name="rviz"/>
+            <node pkg="rviz" type="rviz" name="rviz" required="true"
+                args="-d $(find turtle_follow)/rviz/amcl_sim.rviz"/>
         </group>
     
     
