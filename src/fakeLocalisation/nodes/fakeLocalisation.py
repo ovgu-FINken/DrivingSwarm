@@ -3,12 +3,15 @@ import rospy
 import tf_conversions
 import tf2_ros
 import geometry_msgs.msg
+from std_msgs.msg import Int8
+
+
 from geometry_msgs.msg import Vector3, Quaternion, Transform, TransformStamped
 
 locSystemName = "fakelocalisation"
 
 def create_static_tf(parent, child, transform): #((x,y,z), (q1,q2,q3,q4))):
-    print("Parent: " + parent + " Child: " + child)
+   # print("Parent: " + parent + " Child: " + child)
     if(type(transform) is not tuple): 
 	 br = tf2_ros.StaticTransformBroadcaster()
 	 t = geometry_msgs.msg.TransformStamped()
@@ -30,7 +33,7 @@ def read_tf(count):
     tfBuffer = tf2_ros.Buffer()
     listener = tf2_ros.TransformListener(tfBuffer)
 
-    rate = rospy.Rate(10.0)
+    rate = rospy.Rate(100.0)
 
     while not rospy.is_shutdown():
         for id in range(0, count):
@@ -41,10 +44,13 @@ def read_tf(count):
             create_static_tf("loc_system_" + locSystemName,
                              "loc_system_" + locSystemName +"/target" + str(id),
                              transform_msg.transform)
-	    
+	topic_has_orientation.publish(1) # Orientation is correct
+	topic_correct_mapping.publish(1)  #target1 = robot1 etc.    
 	rate.sleep()
 
 if __name__ == '__main__':
+    topic_has_orientation = rospy.Publisher('loc_system_meta_'+locSystemName+'/has_orientation', Int8, queue_size=1)
+    topic_correct_mapping = rospy.Publisher('loc_system_meta_'+locSystemName+'/correct_mapping', Int8, queue_size=1)
     rospy.init_node('fakeLocalisation')
     botCount = rospy.get_param('~bot_count')
     print("Bot Count: " + str(botCount))
