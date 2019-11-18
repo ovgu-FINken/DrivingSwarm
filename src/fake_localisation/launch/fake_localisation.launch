@@ -1,6 +1,6 @@
   <launch>
     <arg name="bot_count" default="1"/>
-    <node name="fakeLocalisation" pkg="fakeLocalisation" type="fakeLocalisation.py" respawn="false" output="screen">
+    <node name="fake_localisation" pkg="fake_localisation" type="fake_localisation.py" respawn="false" output="screen">
       <param name="bot_count" type="int" value="$(arg bot_count)"/>
     </node>
   </launch>
