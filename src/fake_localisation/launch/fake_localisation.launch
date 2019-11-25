@@ -1,6 +1,18 @@
   <launch>
     <arg name="bot_count" default="1"/>
+    <arg name="loc_system_offset_x" default="0"/>
+    <arg name="loc_system_offset_y" default="0"/>
+    <arg name="loc_system_scale_x" default="1"/>
+    <arg name="loc_system_scale_y" default="1"/>
+    <arg name="target_multiplicativ_sigma" default="1"/>
+    <arg name="target_additiv_sigma" default="0"/>
     <node name="fake_localisation" pkg="fake_localisation" type="fake_localisation.py" respawn="false" output="screen">
       <param name="bot_count" type="int" value="$(arg bot_count)"/>
+      <param name="loc_system_offset_x" type="int" value="$(arg loc_system_offset_x)"/>
+      <param name="loc_system_offset_y" type="int" value="$(arg loc_system_offset_y)"/>
+      <param name="loc_system_scale_x" type="int" value="$(arg loc_system_scale_x)"/>
+      <param name="loc_system_scale_y" type="int" value="$(arg loc_system_scale_y)"/>
+      <param name="target_multiplicativ_sigma" type="int" value="$(arg target_multiplicativ_sigma)"/>
+      <param name="target_additiv_sigma" type="int" value="$(arg target_additiv_sigma)"/>
     </node>
   </launch>
