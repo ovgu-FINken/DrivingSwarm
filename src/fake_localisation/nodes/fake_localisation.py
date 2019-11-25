@@ -30,8 +30,23 @@ def sample_normal_distribution(mu, sigma):
     return s
 
 def add_error_to_transformation(transformation):
-    transformation_with_error = transformation
-    return transformation_with_error
+    transformation.translation.x *=  sample_normal_distribution(1, target_random_multiplicativ_error_sigma)
+    transformation.translation.x += sample_normal_distribution(0, target_random_additiv_error_sigma)
+    transformation.translation.y *= sample_normal_distribution(1, target_random_multiplicativ_error_sigma)
+    transformation.translation.y += sample_normal_distribution(0, target_random_additiv_error_sigma)
+    transformation.translation.z *= sample_normal_distribution(1, target_random_multiplicativ_error_sigma)
+    transformation.translation.z += sample_normal_distribution(0, target_random_additiv_error_sigma)
+
+    transformation.rotation.x *= sample_normal_distribution(1, target_random_multiplicativ_error_sigma)
+    transformation.rotation.x += sample_normal_distribution(0, target_random_additiv_error_sigma)
+    transformation.rotation.y *= sample_normal_distribution(1, target_random_multiplicativ_error_sigma)
+    transformation.rotation.y += sample_normal_distribution(0, target_random_additiv_error_sigma)
+    transformation.rotation.z *= sample_normal_distribution(1, target_random_multiplicativ_error_sigma)
+    transformation.rotation.z += sample_normal_distribution(0, target_random_additiv_error_sigma)
+    transformation.rotation.w *= sample_normal_distribution(1, target_random_multiplicativ_error_sigma)
+    transformation.rotation.w += sample_normal_distribution(0, target_random_additiv_error_sigma)
+
+    return transformation
 
 def read_tf(count):
     tfBuffer = tf2_ros.Buffer()
@@ -67,5 +82,6 @@ if __name__ == '__main__':
     target_random_multiplicativ_error_sigma = rospy.get_param('~target_multiplicativ_sigma')
     target_random_additiv_error_sigma = rospy.get_param('~target_additiv_sigma')
     print("Bot Count: " + str(botCount))
+
     read_tf(botCount)
 
