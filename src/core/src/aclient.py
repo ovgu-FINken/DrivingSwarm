@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+
+# RUNS ON THE TURTLEBOOK
+
 import os
 from datetime import datetime
 
@@ -12,9 +15,10 @@ class BehaviourAClient:
     def __init__(self):
         # open behaviour_list which contains all goals and the respective service calls
         # behaviour_name: service_call
-        goalfile = open('../cfg/behaviour_list.yaml', 'r')
-        self.goals = yaml.load(goalfile)
-        goalfile.close()
+
+            goalfile = open('../cfg/behaviour_list.yaml', 'r')
+            self.goals = yaml.load(goalfile)
+            goalfile.close()
 
         # mode swiches between interactive mode (tui) and non (.yaml file)
         self.mode = rospy.get_param('~inter_mode', False)
@@ -38,7 +42,7 @@ class BehaviourAClient:
 
         # initialise on all servers (turtlebots)
         # TODO
-            
+
             for i, namespace in self.names
                 self.a_clients[i] = actionlib.SimpleActionClient(namespace+'behaviour', BehaviourAction)
 
@@ -54,35 +58,35 @@ class BehaviourAClient:
     def flow_handler(self):
         filedir = os.path.dirname(__file__)
         self.log = open(os.path.join(filedir,'../cfg/flow.log'),'a')
-        
+
         for behav in self.flow:
-            self.flow_step = False
+            self.flow_step = 0
             goal = BehaviourGoal()
             goal.goal_name = behav[0]
             goal.goal_call = behav[1]
-            
+
             for client in self.a_clients:
-                client.send_goal(goal,  feedback_cb=self.flow_feedback, done_cb=self.flow_done)
+                client.send_goal(goal, feedback_cb=self.flow_feedback, done_cb=self.flow_done)
 
             self.log.write('[' + datetime.now().time() + ']: ' + behav[0] + ' with call: ' + behav[1])
 
             rate = rospy.Rate(2)
-            
+
             while not self.flow_step >= self.no_bots:
                 rospy.sleep(rate)
-                
+
             rospy.loginfo('[behaviour_aclient]: moving on to next behaviour in flow')
 
         rospy.loginfo('[behaviour_aclient]: flow done')
         log.close()
-        
-            
+
+
     def flow_feedback(self, feedback):
         self.log.write('['+datetime.now().time()+']: ' + ' PROG[' + feedback.prog_perc + '%] - ' + feedback.prog_status)
     
     def flow_done(self, term_state, result):
         succ = 'SUCCESS - ' if result.res_success else 'FAILURE - '
-        self.log.write('['+datetime.now().time()+']: ' + ' DONE: ' + succ + result.res_msg)
+        self.log.write('['+datetime.now().time()+']: ' + ' DONE ' + succ + result.res_msg)
         self.flow_step += 1
 
 # TODO
@@ -103,7 +107,7 @@ class BehaviourAClient:
             goal.goal_name = behav[0]
             goal.goal_call = behav[1]
             send_goal()
-        
+
         return answer
 #TODO
     def ap_feedback(self, feedback):

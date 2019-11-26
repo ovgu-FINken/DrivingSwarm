@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# RUNS ON THE TURTLEBOT
+
 import os
 
 import rospy
@@ -46,7 +48,7 @@ class BehaviourAServer:
         self.name = rospy.get_namespace()
         
         # new simpleactionserver
-        self.a_server=actionlib.SimpleActionServer(self.name+'behaviour', BehaviourAction, self.execute, False)
+        self.a_server=actionlib.SimpleActionServer(self.name+'_behaviour', BehaviourAction, self.execute, False)
         rospy.loginfo('[behaviour_aserver]: starting with timeout '+str(self.srv_timeout))
         self.a_server.start()
         
@@ -68,22 +70,22 @@ class BehaviourAServer:
 
         parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file, roslaunch_args=[roslaunch_args])
         parent.start()
-        
+        # launched file needs to start a service within 60 seconds
         try:
             rospy.wait_for_service(self.goals[goal.goal_name], timeout=self.srv_timeout)
         except rospy.ROSException:
             FAILURE.result.res_msg = 'failed to start behaviour_service in 60s'
             self.a_server.set_aborted(FAILURE)
             return
-            # service class = pkg.srv.ServiceName
-            # using eval!
+            # CONVENTION: service class = pkg.srv.ServiceName
+            # USING EVAL!
 
-        behav_service = rospy.ServiceProxy(self.goals[goal.goal_name]), eval(goal.goal_name).srv.eval(self.goals[goal.goal_name])
-    
+        eval("behav_service = rospy.ServiceProxy(self.goals[goal.goal_name]), " + goal.goal_name + ".srv." + self.goals[goal.goal_name])
+
         # TODO: implement start, stop and pause request (future)
 
-        rate = rospy.Rate(2)    
-            
+        rate = rospy.Rate(2)
+
         while True:
             # preemption request by a_client
             self.preempted = self.a_server.is_preempt_requested()
@@ -101,12 +103,13 @@ class BehaviourAServer:
             status_msg = status_answer.msg
             
             # TODO: document service messages
+            # message: err <errmessage>
             # service node has encountered an error
             if status_msg[:3] == 'err':
                 FAILURE.result.res_msg = status_msg[3:]
                 self.a_server.set_aborted(FAILURE)
                 parent.stop()
-                return         
+                return
             # service node succeeded
             elif status_msg[:3] == 'suc':
                 SUCCESS.result.res_msg = status_msg[3:]
@@ -118,7 +121,7 @@ class BehaviourAServer:
                 PROGRESS.feedback.prog_perc = status_perc
                 PROGRESS.feedback.prog_status = status_msg
                 self.a_server.publish_feedback(PROGRESS)
-            
+
             rate.sleep()
 
         FAILURE.result.res_msg= 'escaped while true'

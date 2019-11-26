@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+    <group ns="$(env ROS_HOSTNAME)">
+        <node name="test_aclient" pkg="core" type="atest.py" respawn="true"/>
+    </group>
+</launch>
