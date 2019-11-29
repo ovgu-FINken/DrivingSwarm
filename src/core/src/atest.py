@@ -14,10 +14,10 @@ class TestAClient:
         pub = rospy.Publisher('test_aclient', String, queue_size=10)
         rate = rospy.Rate(10)
         pub.publish("started")
-        self.service = rospy.Service('atest', core.srv.atest, test_cb)
+        #self.service = rospy.Service('atest', core.srv.atest, test_cb)
         
         while not rospy.is_shutdown():
-            hello_str = "hello world " + rospy.get_time()
+            hello_str = "hello world " + str(rospy.get_time())
             rospy.loginfo(hello_str)
             pub.publish(hello_str)
             rate.sleep()

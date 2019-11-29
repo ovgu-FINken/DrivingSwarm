@@ -41,7 +41,7 @@ class BehaviourAClient:
                 rospy.loginfo('[behaviour_aclient]: no old flow.log found')
 
         # initialise on all servers (turtlebots)
-        # TODO
+        # TODO TODO
 
             for i, namespace in self.names
                 self.a_clients[i] = actionlib.SimpleActionClient(namespace+'behaviour', BehaviourAction)
@@ -83,7 +83,7 @@ class BehaviourAClient:
 
     def flow_feedback(self, feedback):
         self.log.write('['+datetime.now().time()+']: ' + ' PROG[' + feedback.prog_perc + '%] - ' + feedback.prog_status)
-    
+
     def flow_done(self, term_state, result):
         succ = 'SUCCESS - ' if result.res_success else 'FAILURE - '
         self.log.write('['+datetime.now().time()+']: ' + ' DONE ' + succ + result.res_msg)
@@ -102,7 +102,7 @@ class BehaviourAClient:
         if req.req_type == 0:
             # correct yaml is sent by tui (cf flowfile)
             behav = yaml.load(req.req_msg)
-                    
+
             goal = BehaviourGoal()
             goal.goal_name = behav[0]
             goal.goal_call = behav[1]

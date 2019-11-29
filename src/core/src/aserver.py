@@ -79,7 +79,7 @@ class BehaviourAServer:
             return
             # CONVENTION: service class = pkg.srv.ServiceName
             # USING EVAL!
-
+            # TODO TODO better naming scheme
         eval("behav_service = rospy.ServiceProxy(self.goals[goal.goal_name]), " + goal.goal_name + ".srv." + self.goals[goal.goal_name])
 
         # TODO: implement start, stop and pause request (future)
@@ -101,7 +101,7 @@ class BehaviourAServer:
             status_answer = behav_service.get_status()
             status_perc = status_answer.perc
             status_msg = status_answer.msg
-            
+
             # TODO: document service messages
             # message: err <errmessage>
             # service node has encountered an error
