@@ -1,6 +1,7 @@
-#goal / behaviour to execute
-string goal_name
-string goal_call
+#behaviour to execute
+string behav_name
+string behav_pkg
+string behav_call
 ---
 #result / succeeded/failed
 uint8 ns

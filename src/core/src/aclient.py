@@ -13,12 +13,13 @@ from core.msg import BehaviourAction, BehaviourGoal
 
 class BehaviourAClient:
     def __init__(self):
-        # open behaviour_list which contains all goals and the respective service calls
-        # behaviour_name: service_call
+        # open behaviour_list which contains all behavs in respective packages
+        #pkg_name:
+        #  -service_call
 
-            goalfile = open('../cfg/behaviour_list.yaml', 'r')
-            self.goals = yaml.load(goalfile)
-            goalfile.close()
+            behav_file = open('../cfg/behaviour_list.yaml', 'r')
+            self.behav_list = yaml.safe_load(behav_file)
+            behav_file.close()
 
         # mode swiches between interactive mode (tui) and non (.yaml file)
         self.mode = rospy.get_param('~inter_mode', False)
@@ -27,13 +28,13 @@ class BehaviourAClient:
         if self.mode:
             self.inter_srv = rospy.Service(rospy.get_namespace()+'behaviour_aclient_api', core.srv.BehaviourAPI, self.api_handler )
         else:
-            # flowfile must be of type (DOUBLE QUOTES ARE IMPORTANT HERE)
+            # flow_file must be of type (DOUBLE QUOTES (") ARE IMPORTANT HERE)
             # - ['behaviour_name', "['pkg','launch.file','arg1:=val','arg2:=val', ...]"]
             # - ['behaviour2_name', ...]
             filedir = os.path.dirname(__file__)
-            flowfile = open(os.path.join(filedir,'../cfg/behaviour_flow.yaml'), 'r')
-            self.flow = yaml.load(flowfile)
-            flowfile.close()
+            flow_file = open(os.path.join(filedir,'../cfg/behaviour_flow.yaml'), 'r')
+            self.flow = yaml.safe_load(flow_file)
+            flow_file.close()
 
             try:
                 os.remove(os.path.join(filedir, '../cfg/flow.log'))
@@ -44,7 +45,7 @@ class BehaviourAClient:
         # TODO TODO
 
             for i, namespace in self.names
-                self.a_clients[i] = actionlib.SimpleActionClient(namespace+'behaviour', BehaviourAction)
+                self.a_clients[i] = actionlib.SimpleActionClient(namespace+'_behaviour', BehaviourAction)
 
 
         rospy.loginfo('[behaviour_aclient]: starting with interactive_mode ' + str(mode))
@@ -53,7 +54,7 @@ class BehaviourAClient:
         if not self.mode:
             self.flow_handler()
 
-
+# TODO TODO check if behav from flow_mode actually in behav_list
 # handles behaviour_flow-mode
     def flow_handler(self):
         filedir = os.path.dirname(__file__)
@@ -61,12 +62,13 @@ class BehaviourAClient:
 
         for behav in self.flow:
             self.flow_step = 0
-            goal = BehaviourGoal()
-            goal.goal_name = behav[0]
-            goal.goal_call = behav[1]
+            behav_goal = BehaviourGoal()
+            behav.behav_name = behav[0]
+            behav.behav_pkg = behav[1]
+            behav.behav_call = behav[2]
 
             for client in self.a_clients:
-                client.send_goal(goal, feedback_cb=self.flow_feedback, done_cb=self.flow_done)
+                client.send_behav(behav_goal, feedback_cb=self.flow_feedback, done_cb=self.flow_done)
 
             self.log.write('[' + datetime.now().time() + ']: ' + behav[0] + ' with call: ' + behav[1])
 
@@ -92,25 +94,26 @@ class BehaviourAClient:
 # TODO
 # handler for api-requests
     def api_handler(self, req):
-    # 0 = set a new goal (preempt/replace old one)
-    # 1 = get feedback on goal
-    # 2 = cancel active goal
+    # 0 = set a new behav (preempt/replace old one)
+    # 1 = get feedback on behav
+    # 2 = cancel active behav
     # 3 = try to reconnect bots
     # 3-4 = pause / unpause (in future)
         answer = {'answ_type':0, 'answ_ns':[],'answ_msg':[]}
         # TODO
         if req.req_type == 0:
-            # correct yaml is sent by tui (cf flowfile)
-            behav = yaml.load(req.req_msg)
+            # correct yaml is sent by tui (cf flow_file)
+            behav = yaml.safe_load(req.req_msg)
 
-            goal = BehaviourGoal()
-            goal.goal_name = behav[0]
-            goal.goal_call = behav[1]
-            send_goal()
+            behav = BehaviourGoal()
+            behav.behav_name = behav[0]
+            behav.behav_pkg = behav[1]
+            behav.behav_call = behav[2]
+            send_behav()
 
         return answer
 #TODO
-    def ap_feedback(self, feedback):
+    def api_feedback(self, feedback):
 #TODO
     def api_done(self, result):
 

@@ -14,7 +14,7 @@ class TestAClient:
         pub = rospy.Publisher('test_aclient', String, queue_size=10)
         rate = rospy.Rate(10)
         pub.publish("started")
-        #self.service = rospy.Service('atest', core.srv.atest, test_cb)
+        self.service = rospy.Service('atest', core.srv.atest, test_cb)
         
         while not rospy.is_shutdown():
             hello_str = "hello world " + str(rospy.get_time())
@@ -23,7 +23,7 @@ class TestAClient:
             rate.sleep()
 
 if __name__ == '__main__':
-    rospy.init_node('test_aclient')
+    rospy.init_node('atest')
     test_aclient = TestAClient()
     rospy.spin()
 

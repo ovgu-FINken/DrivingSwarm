@@ -1,2 +1,2 @@
-testbehaviour: testnode
-testbehaviour2: testlaunch
+core:
+  - atest

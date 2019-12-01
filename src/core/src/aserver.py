@@ -38,23 +38,23 @@ class BehaviourAServer:
         # open behaviour_list which contains all goals and the respective service_calls:
         # behaviour_name: service_call
         filedir = os.path.dirname(__file__)
-        goalfile = open(os.path.join(filedir, '../cfg/behaviour_list.yaml'), 'r')
-        self.goals = yaml.load(goalfile)
-        goalfile.close()
+        behav_file = open(os.path.join(filedir, '../cfg/behaviour_list.yaml'), 'r')
+        self.behav_list = yaml.safe_load(behav_file)
+        behav_file.close()
 
         # timeout for looking for service of launched node
         self.srv_timeout = rospy.get_param('~srv_timeout',60)
 
         self.name = rospy.get_namespace()
-        
+
         # new simpleactionserver
         self.a_server=actionlib.SimpleActionServer(self.name+'_behaviour', BehaviourAction, self.execute, False)
         rospy.loginfo('[behaviour_aserver]: starting with timeout '+str(self.srv_timeout))
         self.a_server.start()
-        
-    def execute(self, goal):
-        # if sent goal_name is not a valid/known action don't do anything
-        if goal.goal_name not in self.goals:
+
+    def execute(self, behav):
+        # if sent behav_name is not a valid/known action don't do anything
+        if behav.behav_name not in self.behav_list[behav.behav_pkg]:
             FAILURE.result.res_msg = 'invalid action'
             self.a_server.set_succeeded(FAILURE)
             return
@@ -63,16 +63,17 @@ class BehaviourAServer:
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
 
-        # goal_call has to be in the style of ['pkg','launch.file','arg1:=val','arg2:=val', ...]
-        roslaunch_call = yaml.load(goal.goal_call)
+        # behav_call has to be in the style of ['launch.file','arg1:=val','arg2:=val', ...]
+        roslaunch_call = yaml.safe_load(behav.behav_call)
         roslaunch_file = roslaunch.rlutil.resolve_launch_arguments(cli_args)
         roslaunch_args = cli_args[2:]
 
         parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file, roslaunch_args=[roslaunch_args])
         parent.start()
         # launched file needs to start a service within 60 seconds
+        # TODO TODO test / research how services and namespaces work
         try:
-            rospy.wait_for_service(self.goals[goal.goal_name], timeout=self.srv_timeout)
+            rospy.wait_for_service(behav.behav_name, timeout=self.srv_timeout)
         except rospy.ROSException:
             FAILURE.result.res_msg = 'failed to start behaviour_service in 60s'
             self.a_server.set_aborted(FAILURE)
@@ -80,7 +81,7 @@ class BehaviourAServer:
             # CONVENTION: service class = pkg.srv.ServiceName
             # USING EVAL!
             # TODO TODO better naming scheme
-        eval("behav_service = rospy.ServiceProxy(self.goals[goal.goal_name]), " + goal.goal_name + ".srv." + self.goals[goal.goal_name])
+        eval("behav_service = rospy.ServiceProxy(behav.behav_name, " + behav.behav_pkg + ".srv." + behav.behav_name)
 
         # TODO: implement start, stop and pause request (future)
 
@@ -105,14 +106,14 @@ class BehaviourAServer:
             # TODO: document service messages
             # message: err <errmessage>
             # service node has encountered an error
-            if status_msg[:3] == 'err':
+            if status_msg[:3] == 'ERR':
                 FAILURE.result.res_msg = status_msg[3:]
                 self.a_server.set_aborted(FAILURE)
                 parent.stop()
                 return
             # service node succeeded
-            elif status_msg[:3] == 'suc':
-                SUCCESS.result.res_msg = status_msg[3:]
+            elif status_msg[:3] == 'SUC':
+                SUCCESS.result.res_msg = status_msg[4:]
                 self.a_server.set_succeeded(SUCCESS)
                 parent.stop()
                 return

@@ -1,3 +1,4 @@
-- [testy_di_test, core, launche_di.launch, 7]
-- [testy_di_test, core, launche_di.launch, 12]
-- [testy_di_test, core, launche_di.launch, 7]
+# [behav_name, pkg, call]
+# call as "[
+
+- [testy_di_test, core, launche_di.launch]
