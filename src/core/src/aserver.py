@@ -45,11 +45,10 @@ class BehaviourAServer:
 
         # timeout for looking for service of launched node
         self.srv_timeout = rospy.get_param('~srv_timeout',60)
-
         self.name = rospy.get_namespace()
 
         # new simpleactionserver
-        self.a_server=actionlib.SimpleActionServer(self.name+'_behaviour', BehaviourAction, self.execute, False)
+        self.a_server=actionlib.SimpleActionServer('behaviour_aserver', BehaviourAction, self.execute, False)
         rospy.loginfo('[behaviour_aserver]: starting with timeout '+str(self.srv_timeout))
         self.a_server.start()
 
@@ -71,16 +70,19 @@ class BehaviourAServer:
 
         parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_call_file, roslaunch_args=[roslaunch_call_args])
         parent.start()
+
+        service_name = "/" + rospy.get_namespace() + "/" + behav.behav_name
+
         # launched file needs to start a service within 60 seconds
         try:
-            rospy.wait_for_service("/"+rospy.get_namespace()+"/"+behav.behav_name, timeout=self.srv_timeout)
+            rospy.wait_for_service(service_name, timeout=self.srv_timeout)
         except rospy.ROSException:
             FAILURE.result.res_msg = 'failed to start behaviour_service in 60s'
             self.a_server.set_aborted(FAILURE)
             return
             # CONVENTION: use predefined service class
 
-        behav_service = rospy.ServiceProxy(behav.behav_name, BehaviourStatus)
+        behav_service = rospy.ServiceProxy(service_name, BehaviourStatus)
 
         # TODO: implement start, stop and pause request (future)
 

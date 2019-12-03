@@ -8,6 +8,7 @@ project(core)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED)
+find_package(catkin REQUIRED genmsg actionlib_msgs)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -56,6 +57,9 @@ find_package(catkin REQUIRED)
 #   Service2.srv
 # )
 
+# service for aclient
+add_service_files(DIRECTORY srv FILES BehaviourAPI.srv BehaviourStatus.srv)
+
 ## Generate actions in the 'action' folder
 # add_action_files(
 #   FILES
@@ -63,11 +67,17 @@ find_package(catkin REQUIRED)
 #   Action2.action
 # )
 
+# actionlib for aserver and aclient
+add_action_files(DIRECTORY action FILES Behaviour.action)
+
+
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
 #   std_msgs  # Or other packages containing msgs
 # )
+
+generate_messages(DEPENDENCIES actionlib_msgs)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -98,18 +108,6 @@ find_package(catkin REQUIRED)
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-
-
-
-find_package(catkin REQUIRED genmsg actionlib_msgs)
-
-# actionlib for aserver and aclient
-add_action_files(DIRECTORY action FILES Behaviour.action)
-
-# service for aclient
-add_service_files(DIRECTORY srv FILES BehaviourAPI.srv behav.srv)
-
-generate_messages(DEPENDENCIES actionlib_msgs)
 
 catkin_package(
 #  INCLUDE_DIRS include
