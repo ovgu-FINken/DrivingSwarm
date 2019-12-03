@@ -10,32 +10,36 @@ import actionlib
 import yaml
 
 from core.msg import BehaviourAction, BehaviourGoal
+from core.srv import BehaviourAPI
 
 class BehaviourAClient:
     def __init__(self):
+        filedir = os.path.dirname(__file__)
         # open behaviour_list which contains all behavs in respective packages
         #pkg_name:
         #  -service_call
 
-            behav_file = open('../cfg/behaviour_list.yaml', 'r')
-            self.behav_list = yaml.safe_load(behav_file)
-            behav_file.close()
+        behav_file = open(os.path.join(filedir,'../cfg/behaviour_list.yaml'), 'r')
+        self.behav_list = yaml.safe_load(behav_file)
+        behav_file.close()
 
         # mode swiches between interactive mode (tui) and non (.yaml file)
         self.mode = rospy.get_param('~inter_mode', False)
 
         # start service / load behaviour_flow for sequencing of behaviours
         if self.mode:
-            self.inter_srv = rospy.Service(rospy.get_namespace()+'behaviour_aclient_api', core.srv.BehaviourAPI, self.api_handler )
+            self.inter_srv = rospy.Service('behaviour_aclient_api', BehaviourAPI, self.api_handler )
+            rospy.logwarn('NOT IMPLEMENTED YET')
         else:
-            # flow_file must be of type (DOUBLE QUOTES (") ARE IMPORTANT HERE)
+            # flow_file must be of type
             # - ['behaviour_name', 'pkg', "['file.launch','arg1:=val','arg2:=val', ...]"]
             # - ['behaviour2_name', ...]
-            filedir = os.path.dirname(__file__)
+            # (DOUBLE QUOTES (") ARE IMPORTANT HERE)
+
             flow_file = open(os.path.join(filedir,'../cfg/behaviour_flow.yaml'), 'r')
             self.flow = yaml.safe_load(flow_file)
             flow_file.close()
-
+            #TODO use flow.log
             try:
                 os.remove(os.path.join(filedir, '../cfg/flow.log'))
             except:
@@ -43,13 +47,20 @@ class BehaviourAClient:
 
         # initialise on all servers (turtlebots)
         # TODO TODO
+            bot_file = open(os.path.join(filedir,'../cfg/bot_list.yaml'), 'r')
+            self.names = yaml.save_load(bot_file)
+            bot_file.close()
 
-            for i, namespace in self.names
-                self.a_clients[i] = actionlib.SimpleActionClient(namespace+'_behaviour', BehaviourAction)
+            for namespace in self.names
+                self.a_servers.append = actionlib.SimpleActionClient( 'behaviour_aclient_' + namespace, BehaviourAction)
 
 
         rospy.loginfo('[behaviour_aclient]: starting with interactive_mode ' + str(mode))
-        client.wait_for_server()
+
+
+        for a_server in self.a_servers:
+            rospy.loginfo('[behaviour_aclient]: waiting for ' + a_server.action_client.ns)
+            a_server.wait_for_server()
 
         if not self.mode:
             self.flow_handler()
@@ -58,7 +69,7 @@ class BehaviourAClient:
 # handles behaviour_flow-mode
     def flow_handler(self):
         filedir = os.path.dirname(__file__)
-        self.log = open(os.path.join(filedir,'../cfg/flow.log'),'a')
+        log = open(os.path.join(filedir,'../cfg/flow.log'),'a')
 
         for flow_item in self.flow:
             self.flow_step = 0
@@ -67,8 +78,8 @@ class BehaviourAClient:
             behav.behav_pkg = flow_item[1]
             behav.behav_call = flow_item[2]
 
-            for client in self.a_clients:
-                client.send_behav(behav_goal, feedback_cb=self.flow_feedback, done_cb=self.flow_done)
+            for a_client in self.a_clients:
+                a_client.send_goal(behav_goal, feedback_cb=self.flow_feedback, done_cb=self.flow_done)
 
             self.log.write('[' + datetime.now().time() + ']: ' + behav[0] + ' with call: ' + behav[1])
 
