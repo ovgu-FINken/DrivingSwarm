@@ -1,4 +1,4 @@
 # [behav_name, pkg, call]
-# call as "[
+# call as "['file.launch', 'arg1:=val', 'arg2:=...']"
 
-- [testy_di_test, core, launche_di.launch]
+- [atest, core, "['atest.launch']"]

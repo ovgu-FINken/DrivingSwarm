@@ -29,7 +29,7 @@ class BehaviourAClient:
             self.inter_srv = rospy.Service(rospy.get_namespace()+'behaviour_aclient_api', core.srv.BehaviourAPI, self.api_handler )
         else:
             # flow_file must be of type (DOUBLE QUOTES (") ARE IMPORTANT HERE)
-            # - ['behaviour_name', "['pkg','launch.file','arg1:=val','arg2:=val', ...]"]
+            # - ['behaviour_name', 'pkg', "['file.launch','arg1:=val','arg2:=val', ...]"]
             # - ['behaviour2_name', ...]
             filedir = os.path.dirname(__file__)
             flow_file = open(os.path.join(filedir,'../cfg/behaviour_flow.yaml'), 'r')

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+,#!/usr/bin/env python
 
 # RUNS ON THE TURTLEBOT
 
@@ -10,6 +10,7 @@ import actionlib
 import yaml
 
 from core.msg import BehaviourAction, BehaviourActionFeedback, BehaviourActionResult
+from core.srv import behav
 
 # default action-values, need non-default values
 
@@ -78,10 +79,9 @@ class BehaviourAServer:
             FAILURE.result.res_msg = 'failed to start behaviour_service in 60s'
             self.a_server.set_aborted(FAILURE)
             return
-            # CONVENTION: service class = pkg.srv.ServiceName
-            # USING EVAL!
-            # TODO TODO better naming scheme
-        eval("behav_service = rospy.ServiceProxy(behav.behav_name, " + behav.behav_pkg + ".srv." + behav.behav_name)
+            # CONVENTION: use predefined service class
+
+        behav_service = rospy.ServiceProxy(behav.behav_name, behav)
 
         # TODO: implement start, stop and pause request (future)
 

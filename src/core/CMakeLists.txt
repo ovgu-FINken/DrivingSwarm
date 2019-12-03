@@ -107,7 +107,7 @@ find_package(catkin REQUIRED genmsg actionlib_msgs)
 add_action_files(DIRECTORY action FILES Behaviour.action)
 
 # service for aclient
-add_service_files(DIRECTORY srv FILES BehaviourAPI.srv)
+add_service_files(DIRECTORY srv FILES BehaviourAPI.srv behav.srv)
 
 generate_messages(DEPENDENCIES actionlib_msgs)
 
