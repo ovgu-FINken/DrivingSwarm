@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+
+    <group ns="$(env ROS_HOSTNAME)">
+
+        <node name="behaviour_aclient" pkg="core" type="aclient.py" args="action_timeout:=False" respawn="true"/>
+        
+    </group>
+    
+</launch>

@@ -26,6 +26,10 @@ class BehaviourAClient:
         # mode swiches between interactive mode (tui) and non (.yaml file)
         self.mode = rospy.get_param('~inter_mode', False)
 
+        # timeout for waiting for action clients
+        self.action_timeout = rospy.Duration(rospy.get_param('~action_timeout', 60))
+        # TODO timeout for TUI?
+
         # start service / load behaviour_flow for sequencing of behaviours
         if self.mode:
             self.inter_srv = rospy.Service('behaviour_aclient_api', BehaviourAPI, self.api_handler )
@@ -48,19 +52,23 @@ class BehaviourAClient:
         # initialise on all servers (turtlebots)
         # TODO TODO
             bot_file = open(os.path.join(filedir,'../cfg/bot_list.yaml'), 'r')
-            self.names = yaml.save_load(bot_file)
+            self.names = yaml.safe_load(bot_file)
             bot_file.close()
 
-            for namespace in self.names
-                self.a_servers.append = actionlib.SimpleActionClient( 'behaviour_aclient_' + namespace, BehaviourAction)
+            self.a_servers = []
+            for namespace in self.names:
+                self.a_servers.append(actionlib.SimpleActionClient( 'behaviour_aclient_' + namespace, BehaviourAction))
 
 
-        rospy.loginfo('[behaviour_aclient]: starting with interactive_mode ' + str(mode))
+        rospy.loginfo('[behaviour_aclient]: starting with interactive_mode ' + str(self.mode))
 
 
         for a_server in self.a_servers:
             rospy.loginfo('[behaviour_aclient]: waiting for ' + a_server.action_client.ns)
-            a_server.wait_for_server()
+            a_server.wait_for_server(timeout=self.action_timeout)
+        if not self.a_servers:
+            rospy.logwarn('a_servers is empty (all unreachable)')
+            return 1
 
         if not self.mode:
             self.flow_handler()
@@ -125,9 +133,10 @@ class BehaviourAClient:
         return answer
 #TODO
     def api_feedback(self, feedback):
+        print("WIP")
 #TODO
     def api_done(self, result):
-
+        print("WIP")
 
 
 if __name__ == '__main__':
