@@ -10,7 +10,7 @@ import actionlib
 import yaml
 
 from core.msg import BehaviourAction, BehaviourActionFeedback, BehaviourActionResult
-from core.srv import behav
+from core.srv import BehaviourStatus
 
 # default action-values, need non-default values
 
@@ -66,22 +66,21 @@ class BehaviourAServer:
 
         # behav_call has to be in the style of ['launch.file','arg1:=val','arg2:=val', ...]
         roslaunch_call = yaml.safe_load(behav.behav_call)
-        roslaunch_file = roslaunch.rlutil.resolve_launch_arguments(cli_args)
-        roslaunch_args = cli_args[2:]
+        roslaunch_call_file = roslaunch.rlutil.resolve_launch_arguments(roslaunch_call[1])
+        roslaunch_call_args = roslaunch_call[2:]
 
-        parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file, roslaunch_args=[roslaunch_args])
+        parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_call_file, roslaunch_args=[roslaunch_call_args])
         parent.start()
         # launched file needs to start a service within 60 seconds
-        # TODO TODO test / research how services and namespaces work
         try:
-            rospy.wait_for_service(behav.behav_name, timeout=self.srv_timeout)
+            rospy.wait_for_service("/"+rospy.get_namespace()+"/"+behav.behav_name, timeout=self.srv_timeout)
         except rospy.ROSException:
             FAILURE.result.res_msg = 'failed to start behaviour_service in 60s'
             self.a_server.set_aborted(FAILURE)
             return
             # CONVENTION: use predefined service class
 
-        behav_service = rospy.ServiceProxy(behav.behav_name, behav)
+        behav_service = rospy.ServiceProxy(behav.behav_name, BehaviourStatus)
 
         # TODO: implement start, stop and pause request (future)
 

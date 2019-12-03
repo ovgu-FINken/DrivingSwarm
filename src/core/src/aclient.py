@@ -60,12 +60,12 @@ class BehaviourAClient:
         filedir = os.path.dirname(__file__)
         self.log = open(os.path.join(filedir,'../cfg/flow.log'),'a')
 
-        for behav in self.flow:
+        for flow_item in self.flow:
             self.flow_step = 0
             behav_goal = BehaviourGoal()
-            behav.behav_name = behav[0]
-            behav.behav_pkg = behav[1]
-            behav.behav_call = behav[2]
+            behav.behav_name = flow_item[0]
+            behav.behav_pkg = flow_item[1]
+            behav.behav_call = flow_item[2]
 
             for client in self.a_clients:
                 client.send_behav(behav_goal, feedback_cb=self.flow_feedback, done_cb=self.flow_done)
