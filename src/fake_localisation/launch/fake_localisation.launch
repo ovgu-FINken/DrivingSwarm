@@ -8,15 +8,19 @@
     <arg name="target_additive_noise_translation_sigma" default="0"/>
     <arg name="target_multiplicative_noise_rotation_sigma" default="0"/>
     <arg name="target_additive_noise_rotation_sigma" default="0"/>
+    <arg name="target_scale_x" default="1"/>
+    <arg name="target_scale_y" default="1"/>
     <node name="fake_localisation" pkg="fake_localisation" type="fake_localisation.py" respawn="false" output="screen">
       <param name="bot_count" type="int" value="$(arg bot_count)"/>
-      <param name="loc_system_offset_x" type="int" value="$(arg loc_system_offset_x)"/>
-      <param name="loc_system_offset_y" type="int" value="$(arg loc_system_offset_y)"/>
-      <param name="loc_system_scale_x" type="int" value="$(arg loc_system_scale_x)"/>
-      <param name="loc_system_scale_y" type="int" value="$(arg loc_system_scale_y)"/>
-      <param name="target_multiplicative_noise_translation_sigma" type="int" value="$(arg target_multiplicative_noise_translation_sigma)"/>
-      <param name="target_additive_noise_translation_sigma" type="int" value="$(arg target_additive_noise_translation_sigma)"/>
-      <param name="target_multiplicative_noise_rotation_sigma" type="int" value="$(arg target_multiplicative_noise_rotation_sigma)"/>
-      <param name="target_additive_noise_rotation_sigma" type="int" value="$(arg target_additive_noise_rotation_sigma)"/>
+      <param name="loc_system_offset_x" type="double" value="$(arg loc_system_offset_x)"/>
+      <param name="loc_system_offset_y" type="double" value="$(arg loc_system_offset_y)"/>
+      <param name="loc_system_scale_x" type="double" value="$(arg loc_system_scale_x)"/>
+      <param name="loc_system_scale_y" type="double" value="$(arg loc_system_scale_y)"/>
+      <param name="target_multiplicative_noise_translation_sigma" type="double" value="$(arg target_multiplicative_noise_translation_sigma)"/>
+      <param name="target_additive_noise_translation_sigma" type="double" value="$(arg target_additive_noise_translation_sigma)"/>
+      <param name="target_multiplicative_noise_rotation_sigma" type="double" value="$(arg target_multiplicative_noise_rotation_sigma)"/>
+      <param name="target_additive_noise_rotation_sigma" type="double" value="$(arg target_additive_noise_rotation_sigma)"/>
+      <param name="target_scale_x" type="double" value="$(arg target_scale_x)"/>
+      <param name="target_scale_y" type="double" value="$(arg target_scale_y)"/>
     </node>
   </launch>

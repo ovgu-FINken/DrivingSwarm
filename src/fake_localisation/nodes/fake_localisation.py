@@ -11,8 +11,7 @@ from geometry_msgs.msg import Vector3, Quaternion, Transform, TransformStamped
 
 locSystemName = "fakelocalisation"
 
-def create_tf(tf_broadcaster, parent, child, transform): #((x,y,z), (q1,q2,q3,q4))):
-   # print("Parent: " + parent + " Child: " + child)
+def create_tf(tf_broadcaster, parent, child, transform):
     if(type(transform) is not tuple):
         t = geometry_msgs.msg.TransformStamped()
         t.header.stamp = rospy.Time.now()
@@ -29,14 +28,17 @@ def sample_normal_distribution(mu, sigma):
     s = float(np.random.normal(mu, sigma, 1))
     return s
 
+def scale_transformation(transformation):
+    transformation.translation.x *= target_scale_x;
+    transformation.translation.y *= target_scale_y;
+    return transformation
+
 def add_noise_to_transformation(transformation):
     #add noise on translation
-    transformation.translation.x *=  sample_normal_distribution(1, target_random_multiplicative_noise_translation_sigma)
+    transformation.translation.x *= sample_normal_distribution(1, target_random_multiplicative_noise_translation_sigma)
     transformation.translation.x += sample_normal_distribution(0, target_random_additive_noise_translation_sigma)
     transformation.translation.y *= sample_normal_distribution(1, target_random_multiplicative_noise_translation_sigma)
     transformation.translation.y += sample_normal_distribution(0, target_random_additive_noise_translation_sigma)
-    transformation.translation.z *= sample_normal_distribution(1, target_random_multiplicative_noise_translation_sigma)
-    transformation.translation.z += sample_normal_distribution(0, target_random_additive_noise_translation_sigma)
 
     #calc euler from quaternion
     quaternion = (
@@ -68,8 +70,8 @@ def update_tf(tf_buffer, tf_broadcaster, bot_count):
                 transform_msg = tf_buffer.lookup_transform("loc_system_" + locSystemName, 'tb3_' + str(id) + '/base_footprint', rospy.Time(0))
             except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
                 continue #if not possible try next
-
-            transformation_with_noise = add_noise_to_transformation(transform_msg.transform)
+	    transformation_scaled = scale_transformation(transform_msg.transform)
+            transformation_with_noise = add_noise_to_transformation(transformation_scaled)
 
             #loc_system -> target
             create_tf(tf_broadcaster, "loc_system_" + locSystemName,
@@ -100,6 +102,8 @@ if __name__ == '__main__':
     target_random_additive_noise_translation_sigma = rospy.get_param('~target_additive_noise_translation_sigma')
     target_random_multiplicative_noise_rotation_sigma = rospy.get_param('~target_multiplicative_noise_rotation_sigma')
     target_random_additive_noise_rotation_sigma = rospy.get_param('~target_additive_noise_rotation_sigma')
+    target_scale_x = rospy.get_param('~target_scale_x')
+    target_scale_y = rospy.get_param('~target_scale_y')
 
     #create tf buffer
     tf_buffer = tf2_ros.Buffer()
