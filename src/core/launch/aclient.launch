@@ -3,8 +3,8 @@
 
     <group ns="$(env ROS_HOSTNAME)">
 
-        <node name="behaviour_aclient" pkg="core" type="aclient.py" args="action_timeout:=False" respawn="true"/>
-        
+        <node name="behaviour_aclient" pkg="core" type="aclient.py" args="inter_mode:=False action_timeout:=30" respawn="true"/>
+
     </group>
-    
+
 </launch>
