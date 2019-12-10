@@ -56,9 +56,10 @@ class BehaviourAServer:
         # if sent behav_name is not a valid/known action don't do anything
         if behav.behav_name not in self.behav_list[behav.behav_pkg]:
             FAILURE.result.res_msg = 'invalid action'
+            rospy.logwarn("Sent behav_name is not a known behaviour (in behav_list)")
             self.a_server.set_succeeded(FAILURE)
             return
-
+        rospy.logwarn("Preparing roslaunch for [" + behav.behav_name + "]")
         # prepare roslaunch
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)

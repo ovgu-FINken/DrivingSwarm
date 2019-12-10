@@ -3,7 +3,9 @@
 
     <group ns="$(env ROS_HOSTNAME)">
 
-        <node name="behaviour_aserver" pkg="core" type="aserver.py" args="srv_timeout:=30" respawn="true"/>
+        <node name="behaviour_aserver" pkg="core" type="aserver.py" respawn="true"/>
+            <param name="srv_timeout" type="int" value="30" />
+       </node>
 
     </group>
 
