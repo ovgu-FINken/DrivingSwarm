@@ -66,14 +66,38 @@ class BehaviourAServer:
 
         # behav_call has to be in the style of ['launch.file','arg1:=val','arg2:=val', ...]
         roslaunch_call = yaml.safe_load(behav.behav_call)
-        roslaunch_call_file = roslaunch.rlutil.resolve_launch_arguments(roslaunch_call[0])
-        if len(roslaunch_call) > 1:
-            roslaunch_call_args = roslaunch_call[1:]
-        else:
-            roslaunch_call_args = []
+        roslaunch_args = ''
 
-        parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_call_file, roslaunch_args=[roslaunch_call_args])
-        parent.start()
+        if len(roslaunch_call) > 1:
+            for arg in roslaunch_call[2:]:
+                roslaunch_args += arg + ' '
+
+        roslaunch_command = 'roslaunch ' + behav.behav_pkg + ' ' + roslaunch_call[0] + ' ' + roslaunch_args
+
+        roslaunch_p = subprocess.Popen(roslaunch_command, shell=True)
+
+        # OLD
+        #roslaunch_call_file = roslaunch.rlutil.resolve_launch_arguments(roslaunch_call)[0]
+        #if len(roslaunch_call) > 1:
+        #    roslaunch_call_args = roslaunch_call[1:]
+        #else:
+        #    roslaunch_call_args = []
+
+        #parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_call_file, roslaunch_args=[roslaunch_call_args])
+        #parent.start()
+        rospy.logwarn('Checking ' + roslaunch_command)
+
+        state = roslaunch_p.poll()
+        if state is None:
+            rospy.logwarn('Running fine')
+        elif state < 0:
+            rospy.loginfo('Terminated with error')
+            FAILURE.result.res_msg = 'failed to start with roslaunch'
+            self.a_server.set_aborted(FAILURE)
+        elif state > 0:
+            rospy.loginfo('Terminated')
+            FAILURE.result.res_msg = 'started but terminated with roslaunch'
+            self.a_server.set_aborted(FAILURE)
 
         service_name = "/" + rospy.get_namespace() + "/" + behav.behav_name
 
