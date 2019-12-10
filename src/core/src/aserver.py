@@ -49,25 +49,25 @@ class BehaviourAServer:
 
         # new simpleactionserver
         self.a_server=actionlib.SimpleActionServer('behaviour_aserver', BehaviourAction, self.execute, False)
-        rospy.loginfo('[behaviour_aserver]: starting with timeout '+str(self.srv_timeout))
+        rospy.logwarn('[behaviour_aserver]: starting with timeout '+str(self.srv_timeout))
         self.a_server.start()
 
     def execute(self, behav):
         # if sent behav_name is not a valid/known action don't do anything
         if behav.behav_name not in self.behav_list[behav.behav_pkg]:
             FAILURE.result.res_msg = 'invalid action'
-            rospy.logwarn("Sent behav_name is not a known behaviour (in behav_list)")
+            rospy.logwarn('Sent behav_name is not a known behaviour (in behav_list)')
             self.a_server.set_succeeded(FAILURE)
             return
-        rospy.logwarn("Preparing roslaunch for [" + behav.behav_name + "]")
+        rospy.logwarn('Preparing roslaunch for [' + behav.behav_name + ']')
         # prepare roslaunch
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
 
         # behav_call has to be in the style of ['launch.file','arg1:=val','arg2:=val', ...]
         roslaunch_call = yaml.safe_load(behav.behav_call)
-        roslaunch_call_file = roslaunch.rlutil.resolve_launch_arguments(roslaunch_call[1])
-        roslaunch_call_args = roslaunch_call[2:]
+        roslaunch_call_file = roslaunch.rlutil.resolve_launch_arguments(roslaunch_call[0])
+        roslaunch_call_args = roslaunch_call[1:]
 
         parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_call_file, roslaunch_args=[roslaunch_call_args])
         parent.start()

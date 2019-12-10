@@ -61,12 +61,12 @@ class BehaviourAClient:
             self.no_bots = 0
             for namespace in self.names:
                self.no_bots += 1
-               self.a_clients.append(actionlib.SimpleActionClient( 'behaviour_aclient_' + namespace, BehaviourAction))
+               self.a_clients.append(actionlib.SimpleActionClient( '/' + namespace +'/behaviour_aserver', BehaviourAction))
 
         rospy.logwarn('[behaviour_aclient]: starting with interactive_mode ' + str(self.mode))
 
         for a_client in self.a_clients:
-            rospy.loginfo('[behaviour_aclient]: waiting for ' + a_client.action_client.ns)
+            rospy.logwarn('[behaviour_aclient]: waiting for ' + a_client.action_client.ns)
             a_client.wait_for_server(timeout=self.action_timeout)
             
         if not self.a_clients:
@@ -93,27 +93,29 @@ class BehaviourAClient:
             rospy.logwarn(flow_item)
 
             for a_client in self.a_clients:
+                rospy.logwarn('Sending to ' + a_client.action_client.ns)
                 a_client.send_goal(behav_goal, feedback_cb=self.flow_feedback, done_cb=self.flow_done)
 
             self.log.write('[' + str(datetime.now().time()) + ']: ' + flow_item[0] + ' with call: ' + flow_item[1])
 
             rate = rospy.Rate(2)
-
+            rospy.logwarn('Sleep until flow is done')
             while not self.flow_step >= self.no_bots:
                 rate.sleep()
 
-            rospy.loginfo('[behaviour_aclient]: moving on to next behaviour in flow')
+            rospy.logwarn('[behaviour_aclient]: moving on to next behaviour in flow')
 
-        rospy.loginfo('[behaviour_aclient]: flow done')
+        rospy.logwarn('[behaviour_aclient]: flow done')
         self.log.close()
 
-
     def flow_feedback(self, feedback):
-        self.log.write('['+str(datetime.now().time())+']: ' + ' PROG[' + feedback.prog_perc + '%] - ' + feedback.prog_status)
+        rospy.logwarn('FEEDBACK')
+        self.log.write('['+str(datetime.now().time())+'][' + str(result.ns) + ']: ' + ' PROG[' + feedback.prog_perc + '%] - ' + feedback.prog_status)
 
     def flow_done(self, term_state, result):
+        rospy.logwarn('FLOWDONE ' + str(result.ns))
         succ = 'SUCCESS - ' if result.res_success else 'FAILURE - '
-        self.log.write('['+str(datetime.now().time())+']: ' + ' DONE ' + succ + result.res_msg)
+        self.log.write('['+str(datetime.now().time())+'][' + str(result.ns) + ']: ' + ' DONE ' + succ + result.res_msg)
         self.flow_step += 1
 
 # TODO TODO
