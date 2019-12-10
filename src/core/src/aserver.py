@@ -43,6 +43,7 @@ class BehaviourAServer:
         self.behav_list = yaml.safe_load(behav_file)
         behav_file.close()
 
+
         # timeout for looking for service of launched node
         self.srv_timeout = rospy.get_param('~srv_timeout',60)
         self.name = rospy.get_namespace()
@@ -85,6 +86,7 @@ class BehaviourAServer:
 
         #parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_call_file, roslaunch_args=[roslaunch_call_args])
         #parent.start()
+        
         rospy.logwarn('Checking ' + roslaunch_command)
 
         state = roslaunch_p.poll()

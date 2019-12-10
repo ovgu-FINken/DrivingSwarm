@@ -4,11 +4,11 @@ string behav_pkg
 string behav_call
 ---
 #result / succeeded/failed
-uint8 ns
+string ns
 bool res_success
 string res_msg
 ---
 #feedback / progress
-uint8 ns
+string ns
 uint8 prog_perc
 string prog_status
