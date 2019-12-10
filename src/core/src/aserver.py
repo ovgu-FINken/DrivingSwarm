@@ -1,4 +1,4 @@
-,#!/usr/bin/env python
+#!/usr/bin/env python
 
 # RUNS ON THE TURTLEBOT
 
@@ -32,7 +32,7 @@ PREEMPT.result.ns = rospy.get_namespace()
 PROGRESS = BehaviourActionFeedback()
 PROGRESS.feedback.prog_perc = 0
 PROGRESS.feedback.prog_status = 'default progress'
-PROGRESS.result.ns = rospy.get_namespace()
+PROGRESS.feedback.ns = rospy.get_namespace()
 
 class BehaviourAServer:
     def __init__(self):

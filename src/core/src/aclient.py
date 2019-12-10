@@ -82,14 +82,14 @@ class BehaviourAClient:
         for flow_item in self.flow:
             self.flow_step = 0
             behav_goal = BehaviourGoal()
-            behav.behav_name = flow_item[0]
-            behav.behav_pkg = flow_item[1]
-            behav.behav_call = flow_item[2]
+            behav_goal.behav_name = flow_item[0]
+            behav_goal.behav_pkg = flow_item[1]
+            behav_goal.behav_call = flow_item[2]
 
             for a_client in self.a_clients:
                 a_client.send_goal(behav_goal, feedback_cb=self.flow_feedback, done_cb=self.flow_done)
 
-            self.log.write('[' + datetime.now().time() + ']: ' + behav[0] + ' with call: ' + behav[1])
+            self.log.write('[' + datetime.now().time() + ']: ' + behav_goal[0] + ' with call: ' + behav_goal[1])
 
             rate = rospy.Rate(2)
 
