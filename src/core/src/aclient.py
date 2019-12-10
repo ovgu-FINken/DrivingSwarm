@@ -39,18 +39,17 @@ class BehaviourAClient:
             # - ['behaviour_name', 'pkg', "['file.launch','arg1:=val','arg2:=val', ...]"]
             # - ['behaviour2_name', ...]
             # (DOUBLE QUOTES (") ARE IMPORTANT HERE)
-
+            # TODO make optional flow.log
             flow_file = open(os.path.join(filedir,'../cfg/behaviour_flow.yaml'), 'r')
             self.flow = yaml.safe_load(flow_file)
             flow_file.close()
-            #TODO use flow.log
+
             try:
                 os.remove(os.path.join(filedir, '../cfg/flow.log'))
             except:
-                rospy.loginfo('[behaviour_aclient]: no old flow.log found')
+                rospy.loginfo('[INIT] no old flow.log found')
 
         # initialise on all servers (turtlebots)
-        # TODO TODO
             bot_file = open(os.path.join(filedir,'../cfg/bot_list.yaml'), 'r')
             self.names = yaml.safe_load(bot_file)
             bot_file.close()
@@ -63,18 +62,22 @@ class BehaviourAClient:
                self.no_bots += 1
                self.a_clients.append(actionlib.SimpleActionClient( '/' + namespace +'/behaviour_aserver', BehaviourAction))
 
-        rospy.logwarn('[behaviour_aclient]: starting with interactive_mode ' + str(self.mode))
+        rospy.logwarn('[INIT] Starting with interactive_mode ' + str(self.mode))
 
         for a_client in self.a_clients:
-            rospy.logwarn('[behaviour_aclient]: waiting for ' + a_client.action_client.ns)
-            a_client.wait_for_server(timeout=self.action_timeout)
-            
-        if not self.a_clients:
-            rospy.logwarn('a_clients is empty (all unreachable)')
+            rospy.logwarn('[INIT] Waiting for ' + a_client.action_client.ns)
+            if not a_client.wait_for_server(timeout=self.action_timeout):
+                self.a_clients.remove(a_client)
+                self.no_bots -= 1
+
+        rospy.logwarn(self.a_clients)
+
+        if not self.no_bots > 0:
+            rospy.logwarn('[INIT] a_clients is empty (all unreachable)')
             return 1
 
         if not self.mode:
-            rospy.logwarn("Entering flow mode")
+            rospy.logwarn('[INIT] Entering flow mode')
             self.flow_handler()
 
 # TODO TODO check if behav from flow_mode actually in behav_list
@@ -93,27 +96,28 @@ class BehaviourAClient:
             rospy.logwarn(flow_item)
 
             for a_client in self.a_clients:
-                rospy.logwarn('Sending to ' + a_client.action_client.ns)
+                rospy.logwarn('[FLOW] Sending to ' + a_client.action_client.ns)
                 a_client.send_goal(behav_goal, feedback_cb=self.flow_feedback, done_cb=self.flow_done)
 
             self.log.write('[' + str(datetime.now().time()) + ']: ' + flow_item[0] + ' with call: ' + flow_item[1])
 
             rate = rospy.Rate(2)
-            rospy.logwarn('Sleep until flow is done')
+            rospy.logwarn('[FLOW] Sleep until flow is done')
             while not self.flow_step >= self.no_bots:
                 rate.sleep()
 
-            rospy.logwarn('[behaviour_aclient]: moving on to next behaviour in flow')
+            rospy.logwarn('[FLOW] moving on to next behaviour in flow')
 
-        rospy.logwarn('[behaviour_aclient]: flow done')
+        rospy.logwarn('[FLOW] flow done')
         self.log.close()
-
+        rospy.signal_shutdown('[FLOW] done') 
+# TODO TODO - FIX flow_feedback (and flow_done?) - self is the problem?
     def flow_feedback(self, feedback):
         rospy.logwarn('FEEDBACK')
         self.log.write('['+str(datetime.now().time())+'][' + str(result.ns) + ']: ' + ' PROG[' + feedback.prog_perc + '%] - ' + feedback.prog_status)
 
     def flow_done(self, term_state, result):
-        rospy.logwarn('FLOWDONE ' + str(result.ns))
+        rospy.logwarn('FLOWDONE ' + str(result.res_msg))
         succ = 'SUCCESS - ' if result.res_success else 'FAILURE - '
         self.log.write('['+str(datetime.now().time())+'][' + str(result.ns) + ']: ' + ' DONE ' + succ + result.res_msg)
         self.flow_step += 1

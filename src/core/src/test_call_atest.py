@@ -6,7 +6,7 @@ from core.msg import BehaviourGoal, BehaviourActionGoal
 
 print('started: '+rospy.get_namespace()+'/test.py')
 
-atest_ns = "turtlebot2"
+atest_ns = "turtlebook1"
 
 service_string = '/'+atest_ns+'/test_call'
 

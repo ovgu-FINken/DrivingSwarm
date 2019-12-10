@@ -3,6 +3,7 @@
 # RUNS ON THE TURTLEBOT
 
 import os
+import subprocess
 
 import rospy
 import roslaunch
@@ -43,6 +44,7 @@ class BehaviourAServer:
         self.behav_list = yaml.safe_load(behav_file)
         behav_file.close()
 
+        PROGRESS.feedback.ns = rospy.get_namespace()
 
         # timeout for looking for service of launched node
         self.srv_timeout = rospy.get_param('~srv_timeout',60)
@@ -50,17 +52,17 @@ class BehaviourAServer:
 
         # new simpleactionserver
         self.a_server=actionlib.SimpleActionServer('behaviour_aserver', BehaviourAction, self.execute, False)
-        rospy.logwarn('[behaviour_aserver]: starting with timeout '+str(self.srv_timeout))
+        rospy.logwarn('[INIT] Starting with timeout '+str(self.srv_timeout))
         self.a_server.start()
 
     def execute(self, behav):
         # if sent behav_name is not a valid/known action don't do anything
         if behav.behav_name not in self.behav_list[behav.behav_pkg]:
             FAILURE.result.res_msg = 'invalid action'
-            rospy.logwarn('Sent behav_name is not a known behaviour (in behav_list)')
+            rospy.logwarn('[EXEC] Sent behav_name is not a known behaviour (in behav_list)')
             self.a_server.set_succeeded(FAILURE)
             return
-        rospy.logwarn('Preparing roslaunch for [' + behav.behav_name + ']')
+        rospy.logwarn('[EXEC] Preparing roslaunch for [' + behav.behav_name + ']')
         # prepare roslaunch
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)
@@ -87,17 +89,17 @@ class BehaviourAServer:
         #parent = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_call_file, roslaunch_args=[roslaunch_call_args])
         #parent.start()
         
-        rospy.logwarn('Checking ' + roslaunch_command)
+        rospy.logwarn('[EXEC] Checking ' + roslaunch_command)
 
         state = roslaunch_p.poll()
         if state is None:
-            rospy.logwarn('Running fine')
+            rospy.logwarn('[EXEC] Running fine')
         elif state < 0:
-            rospy.loginfo('Terminated with error')
+            rospy.loginfo('[EXEC] Terminated with error')
             FAILURE.result.res_msg = 'failed to start with roslaunch'
             self.a_server.set_aborted(FAILURE)
         elif state > 0:
-            rospy.loginfo('Terminated')
+            rospy.loginfo('[EXEC] Terminated')
             FAILURE.result.res_msg = 'started but terminated with roslaunch'
             self.a_server.set_aborted(FAILURE)
 
@@ -112,25 +114,25 @@ class BehaviourAServer:
             return
             # CONVENTION: use predefined service class
 
-        behav_service = rospy.ServiceProxy(service_name, BehaviourStatus)
+        behav_get_status = rospy.ServiceProxy(service_name, BehaviourStatus)
 
         # TODO: implement start, stop and pause request (future)
 
-        rate = rospy.Rate(2)
+        rate = rospy.Rate(0.5)
 
         while True:
             # preemption request by a_client
             self.preempted = self.a_server.is_preempt_requested()
             if self.preempted:
                 self.a_server.set_preempted(PREEMPT)
-                parent.stop()
+                roslaunch_p.kill()
                 return
 
             # service file must be of type
             # ---
             # uint8 perc
             # string msg
-            status_answer = behav_service.get_status()
+            status_answer = behav_get_status()
             status_perc = status_answer.perc
             status_msg = status_answer.msg
 
@@ -140,19 +142,20 @@ class BehaviourAServer:
             if status_msg[:3] == 'ERR':
                 FAILURE.result.res_msg = status_msg[3:]
                 self.a_server.set_aborted(FAILURE)
-                parent.stop()
+                roslaunch_p.kill()
                 return
             # service node succeeded
             elif status_msg[:3] == 'SUC':
                 SUCCESS.result.res_msg = status_msg[4:]
                 self.a_server.set_succeeded(SUCCESS)
-                parent.stop()
+                roslaunch_p.kill()
                 return
             # service node progress
             else:
                 PROGRESS.feedback.prog_perc = status_perc
                 PROGRESS.feedback.prog_status = status_msg
-                self.a_server.publish_feedback(PROGRESS)
+                rospy.logwarn(PROGRESS)
+                self.a_server.publish_feedback(PROGRESS.feedback)
 
             rate.sleep()
 
