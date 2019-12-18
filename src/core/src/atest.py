@@ -23,9 +23,9 @@ class TestAClient:
 
         self.hello_str = 'hello world ' + str(rospy.get_time())
         self.prog = 0
-        self.status = "PRO such start"
-        rospy.logwarn(self.hello_str)
-        self.pub.publish(self.hello_str)
+        self.status = "PRO start"
+        #rospy.logwarn(self.hello_str)
+        #self.pub.publish(self.hello_str)
 
     def test_cb(self, msg):
         #self.status = msg.status
@@ -37,7 +37,8 @@ class TestAClient:
     def get_status(self, msg):
         if self.current_calls > self.max_calls:
             self.prog = 100
-            self.status = "SUC wow such done"
+            self.status = "SUC done"
+        self.prog=self.current_calls
         rospy.loginfo("status requested")
         return [self.prog, self.status]
 

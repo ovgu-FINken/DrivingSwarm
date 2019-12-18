@@ -60,7 +60,7 @@ class BehaviourAServer:
         if behav.behav_name not in self.behav_list[behav.behav_pkg]:
             FAILURE.result.res_msg = 'invalid action'
             rospy.logwarn('[EXEC] Sent behav_name is not a known behaviour (in behav_list)')
-            self.a_server.set_succeeded(FAILURE)
+            self.a_server.set_aborted(FAILURE.result)
             return
         rospy.logwarn('[EXEC] Preparing roslaunch for [' + behav.behav_name + ']')
         # prepare roslaunch
@@ -97,11 +97,11 @@ class BehaviourAServer:
         elif state < 0:
             rospy.loginfo('[EXEC] Terminated with error')
             FAILURE.result.res_msg = 'failed to start with roslaunch'
-            self.a_server.set_aborted(FAILURE)
+            self.a_server.set_aborted(FAILURE.result)
         elif state > 0:
             rospy.loginfo('[EXEC] Terminated')
             FAILURE.result.res_msg = 'started but terminated with roslaunch'
-            self.a_server.set_aborted(FAILURE)
+            self.a_server.set_aborted(FAILURE.result)
 
         service_name = "/" + rospy.get_namespace() + "/" + behav.behav_name
 
@@ -110,7 +110,7 @@ class BehaviourAServer:
             rospy.wait_for_service(service_name, timeout=self.srv_timeout)
         except rospy.ROSException:
             FAILURE.result.res_msg = 'failed to start behaviour_service in 60s'
-            self.a_server.set_aborted(FAILURE)
+            self.a_server.set_aborted(FAILURE.result)
             return
             # CONVENTION: use predefined service class
 
@@ -124,7 +124,7 @@ class BehaviourAServer:
             # preemption request by a_client
             self.preempted = self.a_server.is_preempt_requested()
             if self.preempted:
-                self.a_server.set_preempted(PREEMPT)
+                self.a_server.set_preempted(PREEMPT.result)
                 roslaunch_p.kill()
                 return
 
@@ -132,7 +132,14 @@ class BehaviourAServer:
             # ---
             # uint8 perc
             # string msg
-            status_answer = behav_get_status()
+            try:
+                status_answer = behav_get_status()
+            except Exception as e:
+                FAILURE.result.res_msg = '(' +str(type(e))+ '): ' +str(e)+ ' was thrown, service unavailable'
+                self.a_server.set_aborted(FAILURE.result)
+                roslaunch_p.kill()
+                return
+
             status_perc = status_answer.perc
             status_msg = status_answer.msg
 
@@ -141,26 +148,26 @@ class BehaviourAServer:
             # service node has encountered an error
             if status_msg[:3] == 'ERR':
                 FAILURE.result.res_msg = status_msg[3:]
-                self.a_server.set_aborted(FAILURE)
+                self.a_server.set_aborted(FAILURE.result)
                 roslaunch_p.kill()
                 return
             # service node succeeded
             elif status_msg[:3] == 'SUC':
-                SUCCESS.result.res_msg = status_msg[4:]
-                self.a_server.set_succeeded(SUCCESS)
+                SUCCEEDED.result.res_msg = status_msg[3:]
+                self.a_server.set_succeeded(SUCCEEDED.result)
                 roslaunch_p.kill()
                 return
             # service node progress
             else:
                 PROGRESS.feedback.prog_perc = status_perc
                 PROGRESS.feedback.prog_status = status_msg
-                rospy.logwarn(PROGRESS)
+                rospy.logwarn(PROGRESS.feedback)
                 self.a_server.publish_feedback(PROGRESS.feedback)
 
             rate.sleep()
 
         FAILURE.result.res_msg= 'escaped while true'
-        self.a_server.set_aborted(FAILURE)
+        self.a_server.set_aborted(FAILURE.result)
         parent.stop()
 
 if __name__ == '__main__':

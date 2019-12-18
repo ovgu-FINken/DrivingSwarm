@@ -28,6 +28,7 @@ class BehaviourAClient:
 
         # timeout for waiting for action clients
         self.action_timeout = rospy.Duration(rospy.get_param('~action_timeout', 60))
+
         # TODO timeout for TUI?
 
         # start service / load behaviour_flow for sequencing of behaviours
@@ -39,15 +40,15 @@ class BehaviourAClient:
             # - ['behaviour_name', 'pkg', "['file.launch','arg1:=val','arg2:=val', ...]"]
             # - ['behaviour2_name', ...]
             # (DOUBLE QUOTES (") ARE IMPORTANT HERE)
-            # TODO make optional flow.log
+
             flow_file = open(os.path.join(filedir,'../cfg/behaviour_flow.yaml'), 'r')
             self.flow = yaml.safe_load(flow_file)
             flow_file.close()
 
-            try:
-                os.remove(os.path.join(filedir, '../cfg/flow.log'))
-            except:
-                rospy.loginfo('[INIT] no old flow.log found')
+            #try:
+            #    os.remove(os.path.join(filedir, '../cfg/flow.log'))
+            #except:
+            #    rospy.loginfo('[INIT] no old flow.log found')
 
         # initialise on all servers (turtlebots)
             bot_file = open(os.path.join(filedir,'../cfg/bot_list.yaml'), 'r')
@@ -77,29 +78,37 @@ class BehaviourAClient:
             return 1
 
         if not self.mode:
-            rospy.logwarn('[INIT] Entering flow mode')
+            rospy.logwarn('[INIT] Entering [FLOW] mode')
             self.flow_handler()
 
-# TODO TODO check if behav from flow_mode actually in behav_list
 # handles behaviour_flow-mode
     def flow_handler(self):
-        filedir = os.path.dirname(__file__)
-        self.log = open(os.path.join(filedir,'../cfg/flow.log'),'a')
+        #filedir = os.path.dirname(__file__)
+        #self.log = open(os.path.join(filedir,'../cfg/flow.log'),'a')
 
         for flow_item in self.flow:
+
+            try:
+                if flow_item[0] not in self.behav_list[flow_item[1]]:
+                    rospy.signal_shutdown('[ERROR] ' +flow_item[0]+ ' not in behaviour_list (' +flow_item[1]+ ')')
+                    exit()
+            except Exception as e:
+                rospy.signal_shutdow('[ERROR] (' + str(type(e))+str(e) + ') while looking up ' + flow_item[0] + ' in pkg ' + flow_item[1])
+                exit()
+
             self.flow_step = 0
             behav_goal = BehaviourGoal()
             behav_goal.behav_name = flow_item[0]
             behav_goal.behav_pkg = flow_item[1]
             behav_goal.behav_call = flow_item[2]
 
-            rospy.logwarn(flow_item)
+            rospy.logwarn("[FLOW] " + flow_item[0])
 
             for a_client in self.a_clients:
                 rospy.logwarn('[FLOW] Sending to ' + a_client.action_client.ns)
                 a_client.send_goal(behav_goal, feedback_cb=self.flow_feedback, done_cb=self.flow_done)
 
-            self.log.write('[' + str(datetime.now().time()) + ']: ' + flow_item[0] + ' with call: ' + flow_item[1])
+            #self.log.write('[' + str(datetime.now().time()) + ']: ' + str(flow_item[0]) + ' with call: ' + str(flow_item[1]))
 
             rate = rospy.Rate(2)
             rospy.logwarn('[FLOW] Sleep until flow is done')
@@ -109,17 +118,17 @@ class BehaviourAClient:
             rospy.logwarn('[FLOW] moving on to next behaviour in flow')
 
         rospy.logwarn('[FLOW] flow done')
-        self.log.close()
+        #self.log.close()
         rospy.signal_shutdown('[FLOW] done') 
-# TODO TODO - FIX flow_feedback (and flow_done?) - self is the problem?
+
     def flow_feedback(self, feedback):
-        rospy.logwarn('FEEDBACK')
-        self.log.write('['+str(datetime.now().time())+'][' + str(result.ns) + ']: ' + ' PROG[' + feedback.prog_perc + '%] - ' + feedback.prog_status)
+        rospy.logwarn('[FEEDBACK] [' +str(feedback.ns)+ '] ' + str(feedback.prog_status) +' '+ str(feedback.prog_perc))
+        #self.log.write('['+str(datetime.now().time())+'][' + str(feedback.ns) + ']: ' + ' PROG[' + str(feedback.prog_perc) + '%] - ' + str(feedback.prog_status))
 
     def flow_done(self, term_state, result):
-        rospy.logwarn('FLOWDONE ' + str(result.res_msg))
-        succ = 'SUCCESS - ' if result.res_success else 'FAILURE - '
-        self.log.write('['+str(datetime.now().time())+'][' + str(result.ns) + ']: ' + ' DONE ' + succ + result.res_msg)
+        rospy.logwarn('[FLOWDONE] ' + str(result.res_msg))
+        #succ = 'SUCCESS - ' if result.res_success else 'FAILURE - '
+        #self.log.write('['+str(datetime.now().time())+'][' + str(result.ns) + ']: ' + ' DONE ' + succ + result.res_msg)
         self.flow_step += 1
 
 # TODO TODO
@@ -145,10 +154,10 @@ class BehaviourAClient:
         return answer
 #TODO
     def api_feedback(self, feedback):
-        print("WIP")
+        rospy.logwarn("WIP")
 #TODO
     def api_done(self, result):
-        print("WIP")
+        rospy.logwarn("WIP")
 
 
 if __name__ == '__main__':
