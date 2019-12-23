@@ -17,8 +17,8 @@ aclient -> {aserver0, aserver1, aserver2}[label="goal"];
 aserver0 -> behav0[label="launch"];
 aserver1 -> behav1[label="launch"];
 
-behav0_service [shape=note];
-behav0 -> behav0_service[label="provide"];
+behav0_service [label="behav0", shape=note];
+behav0 -> behav0_service[label="provide service"];
 behav0_service -> aserver0[style=dashed];
 aserver0 -> behav0_service[label="get_status"];
 
