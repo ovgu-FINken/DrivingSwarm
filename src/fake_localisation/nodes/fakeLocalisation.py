@@ -4,11 +4,11 @@ import tf_conversions
 from tf.transformations import quaternion_from_euler, euler_from_quaternion
 import tf2_ros
 import geometry_msgs.msg
-from std_msgs.msg import Int8
+from std_msgs.msg import Int8, Int32, Float64
 import numpy as np
 
 from geometry_msgs.msg import Vector3, Quaternion, Transform, TransformStamped
-
+from fake_localisation.msg import localisation_meta
 locSystemName = "fakelocalisation"
 
 def create_tf(tf_broadcaster, parent, child, transform):
@@ -85,12 +85,18 @@ def update_tf(tf_buffer, tf_broadcaster, bot_count):
 def publish_metadata(has_orientation, correct_mapping):
     topic_has_orientation.publish(has_orientation)
     topic_correct_mapping.publish(correct_mapping)
+    localisation_meta_msg = fake_localisatio.msg.localisation_meta()
+    localisation_meta_msg.has_orientation = True
+    localisation_meta_msg.correct_mapping = True
+    localisation_meta_msg.accuracy = 1
+    topic_metadata.publish(localisation_meta_msg);
 
 if __name__ == '__main__':
     rospy.init_node('fakeLocalisation')
     #create topic publisher
     topic_has_orientation = rospy.Publisher('loc_system_meta_' + locSystemName + '/has_orientation', Int8, queue_size=1)
     topic_correct_mapping = rospy.Publisher('loc_system_meta_' + locSystemName + '/correct_mapping', Int8, queue_size=1)
+    topic_metadata = rospy.Publisher('loc_system_meta_locSystemName', localisation_meta,  queue_size=1)
 
     #load all parameters:
     bot_count = rospy.get_param('~bot_count')
