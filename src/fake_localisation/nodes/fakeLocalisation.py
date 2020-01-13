@@ -84,8 +84,10 @@ def update_tf(tf_buffer, tf_broadcaster, bot_count):
                          (create_transform_msg((loc_system_offset_x, loc_system_offset_y, 0), (0, 0, 0, 1))))
 
 def publish_metadata(has_orientation, correct_mapping):
-    topic_has_orientation.publish(has_orientation)
-    topic_correct_mapping.publish(correct_mapping)
+# old
+   # topic_has_orientation.publish(has_orientation)
+   # topic_correct_mapping.publish(correct_mapping)
+#new
     localisation_meta_msg = localisation_meta()
     localisation_meta_msg.has_orientation = True
     localisation_meta_msg.correct_mapping = True
@@ -97,7 +99,7 @@ if __name__ == '__main__':
     #create topic publisher
     topic_has_orientation = rospy.Publisher('loc_system_meta_' + locSystemName + '/has_orientation', Int8, queue_size=1)
     topic_correct_mapping = rospy.Publisher('loc_system_meta_' + locSystemName + '/correct_mapping', Int8, queue_size=1)
-    topic_metadata = rospy.Publisher('loc_system_meta_locSystemName', localisation_meta,  queue_size=1)
+    topic_metadata = rospy.Publisher('loc_system_meta_' + locSystemName, localisation_meta,  queue_size=1)
 
     #load all parameters:
     bot_count = rospy.get_param('~bot_count')
