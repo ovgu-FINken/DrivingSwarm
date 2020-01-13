@@ -85,7 +85,7 @@ def update_tf(tf_buffer, tf_broadcaster, bot_count):
 def publish_metadata(has_orientation, correct_mapping):
     topic_has_orientation.publish(has_orientation)
     topic_correct_mapping.publish(correct_mapping)
-    localisation_meta_msg = fake_localisatio.msg.localisation_meta()
+    localisation_meta_msg = localisation_meta()
     localisation_meta_msg.has_orientation = True
     localisation_meta_msg.correct_mapping = True
     localisation_meta_msg.accuracy = 1
