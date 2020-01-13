@@ -95,7 +95,7 @@ def publish_metadata(has_orientation, correct_mapping):
     topic_metadata.publish(localisation_meta_msg);
 
 if __name__ == '__main__':
-    rospy.init_node('fakeLocalisation')
+    rospy.init_node(locSystemName)
     #create topic publisher
     topic_has_orientation = rospy.Publisher('loc_system_meta_' + locSystemName + '/has_orientation', Int8, queue_size=1)
     topic_correct_mapping = rospy.Publisher('loc_system_meta_' + locSystemName + '/correct_mapping', Int8, queue_size=1)
