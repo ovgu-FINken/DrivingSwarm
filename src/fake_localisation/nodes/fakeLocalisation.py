@@ -62,7 +62,7 @@ def add_noise_to_transformation(transformation):
     transformation.rotation.y = q[1]
     transformation.rotation.z = q[2]
     transformation.rotation.w = q[3]
-    print(transformation)
+    #print(transformation)
     return transformation
 
 def update_tf(tf_buffer, tf_broadcaster, bot_count):
