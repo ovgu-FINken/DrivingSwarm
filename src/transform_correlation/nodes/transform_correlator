@@ -3,10 +3,7 @@ import rospy
 import tf2_ros
 import yaml
 
-def find_frames(tf_buffer, prefix):
-    frames = tfBuffer.all_frames_as_yaml()
-    frames = yaml.load(frames)
-
+def find_frames(frames, prefix):
     target_frames = []
 
     for k,v in frames.items():
@@ -14,6 +11,7 @@ def find_frames(tf_buffer, prefix):
             target_frames.append(k)
 
     return target_frames
+
 
 def correlate_frames(frames_one, frames_two, tfbuffer):
     correlations = {}
@@ -30,18 +28,29 @@ def correlate_frames(frames_one, frames_two, tfbuffer):
     return correlations
 
 
+def find_transforms(frames, pattern):
+    transforms = {}
+    for k,v in frames.items():
+        if pattern in k:
+            transforms[v["parent"]] = k
+
+    return transforms
+
 if __name__ == '__main__':
     rospy.init_node('pheromone_sensor')
 
     tfBuffer = tf2_ros.Buffer()
     listener = tf2_ros.TransformListener(tfBuffer)
 
-
     rate = rospy.Rate(1)
     while not rospy.is_shutdown():
-        uwb_frames = find_frames(tfBuffer, "loc_system_uwb/target")
-        whycon_frames = find_frames(tfBuffer, "loc_system_whycon/target")
+        frames = tfBuffer.all_frames_as_yaml()
+        frames = yaml.load(frames)
+
+        uwb_frames = find_frames(frames, "loc_system_uwb/target")
+        whycon_frames = find_frames(frames, "loc_system_whycon/target")
+
         correlations = correlate_frames(whycon_frames, uwb_frames, tfBuffer)
-        print(correlations)
+        turtle_targets = find_transforms(frames, "turtlebot")
         rate.sleep()
 
