@@ -12,7 +12,6 @@ def find_frames(frames, prefix):
 
     return target_frames
 
-
 def correlate_frames(frames_one, frames_two, tfbuffer):
     correlations = {}
     for f1 in frames_one:
@@ -52,5 +51,6 @@ if __name__ == '__main__':
 
         correlations = correlate_frames(whycon_frames, uwb_frames, tfBuffer)
         turtle_targets = find_transforms(frames, "turtlebot")
+        print(correlations)
         rate.sleep()
 
