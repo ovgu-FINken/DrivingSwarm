@@ -1,0 +1,13 @@
+location: .gitman
+sources:
+- name: turtlebot3
+  repo: https://github.com/ROBOTIS-GIT/turtlebot3.git
+  type: git
+  rev: 4da5676fab45703e1ee5ac8b675d7f447c13489f
+  link: src/turtlebot3
+
+- name: turtlebot3_msgs
+  repo: https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git
+  type: git
+  rev: 036a68972d967c813dad84a4dfcee52f425e7f40
+  link: src/turtlebot3_msgs
