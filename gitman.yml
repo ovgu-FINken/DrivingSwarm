@@ -11,3 +11,21 @@ sources:
   type: git
   rev: 036a68972d967c813dad84a4dfcee52f425e7f40
   link: src/turtlebot3_msgs
+
+- name: turtlebot3_simulations
+  repo: https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
+  type: git
+  rev: master
+  link: src/turtlebot3_simulations
+
+- name: openslam_gmapping
+  repo: https://github.com/ros-perception/openslam_gmapping
+  type: git
+  rev: c716f0192131029b31a49554f8c11353d29819a5
+  link: src/openslam_gmapping
+
+- name: slam_gmapping
+  repo: https://github.com/ros-perception/slam_gmapping
+  type: git
+  rev: 5a707e079364ab9f5349c72310f31bfed4a6c834
+  link: src/slam_gmapping
