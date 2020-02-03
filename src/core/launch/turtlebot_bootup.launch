@@ -6,14 +6,13 @@
     <group ns="$(env ROS_HOSTNAME)">
 
         <include file="$(find turtlebot3_bringup)/launch/turtlebot3_robot.launch">
-		<arg name="multi_robot_name" value="$(env HOSTNAME)"/>
+		<arg name="multi_robot_name" value="$(env ROS_HOSTNAME)"/>
 	</include>
 
-	<include file="$(find turtlebot3_slam)/launch/turtlebot3_slam.launch">
-		<arg name="slam_methods" value="gmapping"/>
-		<arg name="open_rviz" value="False"/>
-	</include>
         <!--node name="behaviour_aserver" pkg="core" type="aserver.py" args="srv_timeout:=60" respawn="true"/-->
+
+	<!-- ADD YOUR LAUNCHFILES HERE-->
+	<include file="$(find core)/launch/turtlebot_bootup_slam.launch"/>
 
     </group>
 </launch>
