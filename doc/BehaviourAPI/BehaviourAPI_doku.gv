@@ -1,0 +1,25 @@
+digraph api
+{
+
+
+inter_mode [label="behaviour_flow /\ninteractive", shape=box];
+inter_mode -> aclient[label="control"];
+
+aclient [style=filled];
+aserver0 [style=filled];
+aserver1 [style=filled];
+aserver2 [style=filled];
+
+
+aclient -> {aserver0, aserver1, aserver2}[label="goal"];
+{aserver0, aserver1, aserver2} -> aclient[style=dashed];
+
+aserver0 -> behav0[label="launch"];
+aserver1 -> behav1[label="launch"];
+
+behav0_service [label="behav0", shape=note];
+behav0 -> behav0_service[label="provide service"];
+behav0_service -> aserver0[style=dashed];
+aserver0 -> behav0_service[label="get_status"];
+
+}

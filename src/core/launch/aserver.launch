@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+
+    <group ns="$(env ROS_HOSTNAME)">
+
+        <node name="behaviour_aserver" pkg="core" type="aserver.py" respawn="true">
+            <param name="srv_timeout" type="int" value="30" />
+       </node>
+
+    </group>
+
+</launch>

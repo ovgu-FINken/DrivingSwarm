@@ -2,4 +2,11 @@
 <launch>
     <node name="master_discovery" pkg="master_discovery_fkie" type="master_discovery" args="_mcast_group:=224.0.0.1" respawn="true"/>
     <node name="master_sync" pkg="master_sync_fkie" type="master_sync" respawn="true"/>
+
+    <group ns="$(env ROS_HOSTNAME)">
+
+        <!--node name="behaviour_aclient" pkg="core" type="aclient.py" args="inter_mode:=False" respawn="true"/-->
+        
+    </group>
+    
 </launch>

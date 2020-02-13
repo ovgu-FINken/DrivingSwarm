@@ -1,0 +1,4 @@
+# service file must be of type
+---
+uint8 perc
+string msg

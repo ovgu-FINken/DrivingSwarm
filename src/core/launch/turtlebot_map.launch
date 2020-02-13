@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="multi_robot_name" default="$(env ROS_HOSTNAME)"/>
+    <arg name="map_file" default="$(find core)/maps/world.yaml"/>
+
+    <!-- Static map_server -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
+      <param name="~frame_id" value="$(arg multi_robot_name)/map"/>
+    </node>
+
+    </group>
+</launch>

@@ -1,7 +1,27 @@
 <?xml version="1.0"?>
 <launch>
-    <node name="master_discovery" pkg="master_discovery_fkie" type="master_discovery" args="_mcast_group:=224.0.0.1" respawn="true"/>
-    <node name="master_sync" pkg="master_sync_fkie" type="master_sync" respawn="true"/>
-    <!--node name="turtlebot_bringup" pkg="turtlebot3_bringup" type="turtlebot3_robot" respawn="true"/--> 
-    <include ns="$(env ROS_HOSTNAME)" file="$(find turtlebot3_bringup)/launch/turtlebot3_robot.launch"/>
+	<node name="master_discovery" pkg="master_discovery_fkie" type="master_discovery" args="_mcast_group:=224.0.0.1" respawn="true"/>
+	<node name="master_sync" pkg="master_sync_fkie" type="master_sync" respawn="true"/>
+
+	<group ns="$(env ROS_HOSTNAME)">
+
+		<include file="$(find turtlebot3_bringup)/launch/turtlebot3_robot.launch">
+			<arg name="multi_robot_name" value="$(env ROS_HOSTNAME)"/>
+			<arg name="set_lidar_frame_id" value="$(env ROS_HOSTNAME)/base_scan"/>
+		</include>
+
+	<!-- TurtleBot3 -->
+		<include file="$(find turtlebot3_bringup)/launch/turtlebot3_remote.launch">
+			<arg name="model" value="burger" />
+			<arg name="multi_robot_name" value="$(env ROS_HOSTNAME)"/>
+		</include>
+
+	<!--node name="behaviour_aserver" pkg="core" type="aserver.py" args="srv_timeout:=60" respawn="true"/-->
+
+	<!-- ADD YOUR LAUNCHFILES HERE-->
+	<!--include file="$(find core)/launch/turtlebot_amcl.launch"/-->
+	<!--include file="$(find core)/launch/turtlebot_move.launch"/-->
+	<!--include file="$(find core)/launch/turtlebot_map.launch"/-->
+	<!--include file="$(find core)/launch/turtlebot_slam.launch"/-->
+	</group>
 </launch>

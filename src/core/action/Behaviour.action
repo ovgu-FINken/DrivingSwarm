@@ -1,0 +1,14 @@
+#behaviour to execute
+string behav_name
+string behav_pkg
+string behav_call
+---
+#result / succeeded/failed
+string ns
+bool res_success
+string res_msg
+---
+#feedback / progress
+string ns
+uint8 prog_perc
+string prog_status
