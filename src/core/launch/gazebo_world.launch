@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<launch>
+
+<arg name="multi_robot_name" default="bookturtle1"/>
+<arg name="gazebo_port" default="11345"/>
+<arg name="world_file" default="$(find turtlebot3_gazebo)/worlds/turtlebot3_house.world"/>
+	<group ns="$(arg multi_robot_name)">
+		<include file="$(find gazebo_ros)/launch/empty_world.launch">
+			<!--arg name="world_name" value="$(arg world_file)"/-->
+			<arg name="paused" value="false"/>
+			<arg name="use_sim_time" value="false"/>
+			<arg name="gui" value="true"/>
+			<arg name="headless" value="false"/>
+			<arg name="debug" value="false"/>
+			<env name="GAZEBO_MASTER_URI" value="http://localhost:$(arg gazebo_port)"/>
+		</include>
+	</group>
+</launch>

@@ -93,7 +93,7 @@ class BehaviourAClient:
                     rospy.signal_shutdown('[ERROR] ' +flow_item[0]+ ' not in behaviour_list (' +flow_item[1]+ ')')
                     exit()
             except Exception as e:
-                rospy.signal_shutdow('[ERROR] (' + str(type(e))+str(e) + ') while looking up ' + flow_item[0] + ' in pkg ' + flow_item[1])
+                rospy.signal_shutdown('[ERROR] (' + str(type(e))+str(e) + ') while looking up ' + flow_item[0] + ' in pkg ' + flow_item[1])
                 exit()
 
             self.flow_step = 0
@@ -163,4 +163,4 @@ class BehaviourAClient:
 if __name__ == '__main__':
     rospy.init_node('behaviour_aclient')
     behaviour_aclient = BehaviourAClient()
-    rospy.spin()
+    #rospy.spin()

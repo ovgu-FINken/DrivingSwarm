@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<launch>
+
+	<arg name="multi_robot_name" default="bookturtle1"/>
+	<arg name="gazebo_port" default="11355"/>
+	<arg name="ros_port" default="11322"/>
+	<arg name="mcast_group" default="224.0.0.1"/>
+	<arg name="mcast_port" default="11512"/>
+
+	<env name="ROS_MASTER_URI" value="http://localhost:$(arg ros_port)"/>
+	<env name="GAZEBO_MASTER_URI" value="http://localhost:$(arg gazebo_port)"/>
+
+	<!--node name="master_discovery" pkg="master_discovery_fkie" type="master_discovery" args="_mcast_group:=$(arg mcast_group) _mcast_port:=$(arg mcast_port)" respawn="true"/-->
+	<!--node name="master_sync" pkg="master_sync_fkie" type="master_sync" respawn="true"/-->
+
+
+	<include file="$(find core)/launch/gazebo_bot.launch">
+		<arg name="multi_robot_name" value="$(arg multi_robot_name)"/>
+
+	</include>
+</launch>
+
