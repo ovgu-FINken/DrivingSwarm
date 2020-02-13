@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger]"/>
+
   <arg name="multi_robot_name" default="$(env ROS_HOSTNAME)"/>
-  <!-- map_server -->
-  <arg name="map_file" default="$(find core)/maps/world.yaml"/>
+
   <!-- AMCL -->
   <arg name="scan_topic"     default="scan"/>
   <arg name="update_min_d"   default="0.20"/>
@@ -11,20 +10,10 @@
   <arg name="initial_pose_x" default="0.0"/>
   <arg name="initial_pose_y" default="0.0"/>
   <arg name="initial_pose_a" default="0.0"/>
-  <arg name="use_map_topic" default="false"/>
+  <arg name="use_map_topic"  default="false"/>
   <arg name="first_map_only" default="false"/>
 
 
-  <!-- TurtleBot3 -->
-  <include file="$(find turtlebot3_bringup)/launch/turtlebot3_remote.launch">
-    <arg name="model" value="$(arg model)" />
-    <arg name="multi_robot_name" value="$(arg multi_robot_name)"/>
-  </include>
-
-  <!-- Static map_server -->
-  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
-    <param name="~frame_id" value="$(arg multi_robot_name)/map"/>
-  </node>
 
   <!-- AMCL -->
   <node pkg="amcl" type="amcl" name="amcl">
