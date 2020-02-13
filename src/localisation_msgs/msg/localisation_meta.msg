@@ -1,0 +1,3 @@
+bool has_orientation
+bool correct_mapping
+float64 accuracy
