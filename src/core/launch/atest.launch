@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
     <!-- DO NOT USE REGULAR NS-GROUP-->
-        <node name="test_aclient" pkg="core" type="atest.py" respawn="true">
+        <node name="test_aclient" pkg="core" type="atest.py" respawn="false">
             <param name="max_calls" type="int" value="11" />
         </node>
 

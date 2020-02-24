@@ -36,12 +36,12 @@
 
 
 		<!-- ADD YOUR GAZEBO_LAUNCHFILES FOR EVERY BOT HERE-->
-		<include file="$(find core)/launch/turtlebot_slam.launch">
-			<arg name="multi_robot_name" value="$(arg multi_robot_name)"/>
-		</include>
-		<include file="$(find core)/launch/turtlebot_move.launch">
-			<arg name="multi_robot_name" value="$(arg multi_robot_name)"/>
-		</include>
+		<!--include file="$(find core)/launch/turtlebot_slam.launch"-->
+			<!--arg name="multi_robot_name" value="$(arg multi_robot_name)"/-->
+		<!--/include-->
+		<!--include file="$(find core)/launch/turtlebot_move.launch"-->
+			<!--arg name="multi_robot_name" value="$(arg multi_robot_name)"/-->
+		<!--/include-->
 
 	</group>
 </launch>
