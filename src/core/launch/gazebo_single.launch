@@ -7,13 +7,26 @@
 	<arg name="y_pos" default="-0.5"/>
 	<arg name="z_pos" default="0.0"/>
 
-	<arg name="gazebo_port" default="11345"/>
+	<arg name="world_file" default="$(find turtlebot3_gazebo)/worlds/turtlebot3_house.world"/>
+
+	<arg name="gazebo_port" default="11355"/>
+
+	<env name="GAZEBO_MASTER_URI" value="http://localhost:$(arg gazebo_port)"/>
+	<remap from="/clock" to="/$(arg multi_robot_name)/clock"/>
 
 	<group ns="$(arg multi_robot_name)">
 
-		<!--env name="GAZEBO_MASTER_URI" value="http://localhost:$(arg gazebo_port)"/-->
+		<include file="$(find gazebo_ros)/launch/empty_world.launch">
+			<arg name="world_name" value="$(arg world_file)"/>
+			<arg name="paused" value="false"/>
+			<arg name="use_sim_time" value="true"/>
+			<arg name="gui" value="true"/>
+			<arg name="headless" value="false"/>
+			<arg name="debug" value="false"/>
+		</include>
 
-		<node pkg="robot_state_publisher" type="robot_state_publisher" name	="robot_state_publisher" output="screen">
+
+		<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
 			<param name="publish_frequency" type="double" value="50.0" />
 			<param name="tf_prefix" value="$(arg multi_robot_name)" />
 		</node>
@@ -23,7 +36,12 @@
 
 
 		<!-- ADD YOUR GAZEBO_LAUNCHFILES FOR EVERY BOT HERE-->
-		<!--include file="$(find core)/launch/gazebo_slam.launch"/-->
+		<include file="$(find core)/launch/turtlebot_slam.launch">
+			<arg name="multi_robot_name" value="$(arg multi_robot_name)"/>
+		</include>
+		<include file="$(find core)/launch/turtlebot_move.launch">
+			<arg name="multi_robot_name" value="$(arg multi_robot_name)"/>
+		</include>
 
 	</group>
 </launch>
