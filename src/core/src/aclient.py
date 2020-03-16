@@ -19,7 +19,7 @@ class BehaviourAClient:
         #pkg_name:
         #  -service_call
 
-        behav_file = open(os.path.join(filedir,'../cfg/behaviour_list.yaml'), 'r')
+        behav_file = open(os.path.join(filedir,'../config/behaviour_list.yaml'), 'r')
         self.behav_list = yaml.safe_load(behav_file)
         behav_file.close()
 
@@ -41,17 +41,17 @@ class BehaviourAClient:
             # - ['behaviour2_name', ...]
             # (DOUBLE QUOTES (") ARE IMPORTANT HERE)
 
-            flow_file = open(os.path.join(filedir,'../cfg/behaviour_flow.yaml'), 'r')
+            flow_file = open(os.path.join(filedir,'../config/behaviour_flow.yaml'), 'r')
             self.flow = yaml.safe_load(flow_file)
             flow_file.close()
 
             #try:
-            #    os.remove(os.path.join(filedir, '../cfg/flow.log'))
+            #    os.remove(os.path.join(filedir, '../config/flow.log'))
             #except:
             #    rospy.loginfo('[INIT] no old flow.log found')
 
         # initialise on all servers (turtlebots)
-            bot_file = open(os.path.join(filedir,'../cfg/bot_list.yaml'), 'r')
+            bot_file = open(os.path.join(filedir,'../config/bot_list.yaml'), 'r')
             self.names = yaml.safe_load(bot_file)
             bot_file.close()
 
@@ -84,7 +84,7 @@ class BehaviourAClient:
 # handles behaviour_flow-mode
     def flow_handler(self):
         #filedir = os.path.dirname(__file__)
-        #self.log = open(os.path.join(filedir,'../cfg/flow.log'),'a')
+        #self.log = open(os.path.join(filedir,'../config/flow.log'),'a')
 
         for flow_item in self.flow:
 
@@ -163,4 +163,4 @@ class BehaviourAClient:
 if __name__ == '__main__':
     rospy.init_node('behaviour_aclient')
     behaviour_aclient = BehaviourAClient()
-    #rospy.spin()
+    rospy.spin()

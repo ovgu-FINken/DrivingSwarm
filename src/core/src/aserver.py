@@ -40,7 +40,7 @@ class BehaviourAServer:
         # open behaviour_list which contains all goals and the respective service_calls:
         # behaviour_name: service_call
         filedir = os.path.dirname(__file__)
-        behav_file = open(os.path.join(filedir, '../cfg/behaviour_list.yaml'), 'r')
+        behav_file = open(os.path.join(filedir, '../config/behaviour_list.yaml'), 'r')
         self.behav_list = yaml.safe_load(behav_file)
         behav_file.close()
 
