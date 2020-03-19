@@ -7,15 +7,12 @@ import geometry_msgs.msg
 from std_msgs.msg import Int8, Int32, Float64
 import numpy as np
 import sys
-
 from geometry_msgs.msg import Vector3, Quaternion, Transform, TransformStamped
-#from fake_localisation.msg import localisation_meta
 from localisation_msgs.msg import localisation_meta
 
 mapping = []
-
-def create_tf(tf_broadcaster, parent, child, transform):
-    if(type(transform) is not tuple):
+# broadcast a transformation
+def broadcast_tf(tf_broadcaster, parent, child, transform):
         t = geometry_msgs.msg.TransformStamped()
         t.header.stamp = rospy.Time.now()
         t.header.frame_id = parent
@@ -27,15 +24,18 @@ def create_transform_msg((x,y,z),(qx,qy,qz,qw)):
     t = Transform(Vector3(x,y,z), Quaternion(qx,qy,qz,qw))
     return t
 
+#returns a sample from normal distribution
 def sample_normal_distribution(mu, sigma):
     s = float(np.random.normal(mu, sigma, 1))
     return s
 
+# returns a scaled transformation
 def scale_transformation(transformation):
     transformation.translation.x *= target_scale_x;
     transformation.translation.y *= target_scale_y;
     return transformation
 
+# returns a transformation with added noise.
 def add_noise_to_transformation(transformation):
     #add noise on translation
     transformation.translation.x *= sample_normal_distribution(1, target_random_multiplicative_noise_translation_sigma)
@@ -50,6 +50,7 @@ def add_noise_to_transformation(transformation):
         transformation.rotation.z,
         transformation.rotation.w)
     euler = list(euler_from_quaternion(quaternion)) #tuples are inmutable -> cast to list
+
     #add noise
     for i in range(2):
         euler[i] *= sample_normal_distribution(1,target_random_multiplicative_noise_rotation_sigma)
@@ -67,31 +68,37 @@ def add_noise_to_transformation(transformation):
     #print(transformation)
     return transformation
 
-def update_tf(tf_buffer, tf_broadcaster, bot_count, locSystemName):
-        for id in range(0, bot_count):
+# reads TF from simulation and updates TF
+def update_tf(tf_buffer, tf_broadcaster, bot_count, locSystemName, loc_system_rotation_angle):
+        for id in range(bot_count):
             try: #get tf from loc_system_locSytemName -> World -> .. -> tb3_id/base_footprint
-                transform_msg = tf_buffer.lookup_transform("loc_system_" + locSystemName, 'tb3_' + mapping[id] + '/base_footprint', rospy.Time(0))
+                #print("Lookup: " +  "loc_system_" + locSystemName + " --> " + 'tb3_' + str(id) + '/base_footprint')
+                transform_msg = tf_buffer.lookup_transform("loc_system_" + locSystemName, 'tb3_' + str(id) + '/base_footprint', rospy.Time(0))
             except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
                 continue #if not possible try next
-	        transformation_scaled = scale_transformation(transform_msg.transform)
-            transformation_with_noise = add_noise_to_transformation(transformation_scaled)
 
-            #loc_system -> target
-            create_tf(tf_broadcaster, "loc_system_" + locSystemName,
-                             "loc_system_" + locSystemName +"/target" + str(id),
+            #scale and add nose to the data
+            transformation_with_noise = add_noise_to_transformation(scale_transformation(transform_msg.transform))
+
+            #TF: loc_system -> target
+            broadcast_tf(tf_broadcaster, "loc_system_" + locSystemName,
+                             "loc_system_" + locSystemName +"/target" + mapping[id],
                              transformation_with_noise)
 
-        #world -> loc_system
-        create_tf(tf_broadcaster, 'world', "loc_system_" + locSystemName,
-                         (create_transform_msg((loc_system_offset_x, loc_system_offset_y, 0), (0, 0, 0, 1))))
+        #TF: world -> loc_system
+        q = quaternion_from_euler(0, 0, loc_system_rotation_angle)
+        broadcast_tf(tf_broadcaster, 'world', "loc_system_" + locSystemName,
+                         (create_transform_msg((loc_system_offset_x, loc_system_offset_y, 0), (q[0], q[1], q[2], q[3]))))
 
+#publishes data to the metadata topic
 def publish_metadata(has_orientation, correct_mapping, accuracy):
     localisation_meta_msg = localisation_meta()
-    localisation_meta_msg.has_orientation = True
-    localisation_meta_msg.correct_mapping = True
+    localisation_meta_msg.has_orientation = has_orientation
+    localisation_meta_msg.correct_mapping = correct_mapping
     localisation_meta_msg.accuracy = accuracy
     topic_metadata.publish(localisation_meta_msg);
 
+#generates an array from 0 to botcount with rising(correct = true) or random (correct = false) order
 def genMapping(bot_count, correct_mapping = False):
     mapping = np.arange(0, bot_count)
     if correct_mapping:
@@ -100,19 +107,23 @@ def genMapping(bot_count, correct_mapping = False):
        return np.array(np.random.permutation(mapping)).astype('str')
 
 if __name__ == '__main__':
+
+    #read the locsystemname as arg
     if len(sys.argv) < 2:
         print("please pass name as arg, using default: fakelocalisation")
-        rospy.init_node("fakelocalisation")
+        loc_system_name = "fakelocalisation"
     else:
-        rospy.init_node(sys.argv[1])
+        loc_system_name = sys.argv[1]
+        
+    rospy.init_node(loc_system_name)
 
-    #load all parameters:
+    #read all local parameters:
     bot_count = rospy.get_param('~bot_count')
     loc_system_offset_x = rospy.get_param('~loc_system_offset_x')
     loc_system_offset_y = rospy.get_param('~loc_system_offset_y')
     loc_system_scale_x = rospy.get_param('~loc_system_scale_x')
     loc_system_scale_y = rospy.get_param('~loc_system_scale_y')
-    loc_system_name = rospy.get_param('~loc_system_name') 
+    loc_system_rotation_angle = rospy.get_param('~loc_system_rotation_angle')
 
     target_random_multiplicative_noise_translation_sigma = rospy.get_param('~target_multiplicative_noise_translation_sigma')
     target_random_additive_noise_translation_sigma = rospy.get_param('~target_additive_noise_translation_sigma')
@@ -126,20 +137,24 @@ if __name__ == '__main__':
     meta_accuracy = rospy.get_param('~meta_accuracy')
 
     #create topic publisher
-    #topic_has_orientation = rospy.Publisher('loc_system_meta_' + loc_system_name + '/has_orientation', Int8, queue_size=1)
-    #topic_correct_mapping = rospy.Publisher('loc_system_meta_' + loc_system_name + '/correct_mapping', Int8, queue_size=1)
     topic_metadata = rospy.Publisher('loc_system_meta_' + loc_system_name, localisation_meta,  queue_size=1)
     
     #create tf buffer
     tf_buffer = tf2_ros.Buffer()
     tf2_ros.TransformListener(tf_buffer)
+
     #create tf broadcaster
     tf_broadcaster = tf2_ros.TransformBroadcaster()
 
+    #generate target mapping (random/correct)
     mapping = genMapping(bot_count, meta_correct_mapping)
 
-    rate = rospy.Rate(100.0)
+    rate = rospy.Rate(100.0) #100Hz
+
+    #main loop:
     while not rospy.is_shutdown():
-        update_tf(tf_buffer, tf_broadcaster, bot_count, loc_system_name)
+        #update tf
+        update_tf(tf_buffer, tf_broadcaster, bot_count, loc_system_name, loc_system_rotation_angle)
+        #update meta topic
         publish_metadata(meta_has_orientation, meta_correct_mapping, meta_accuracy)
         rate.sleep()

@@ -2,10 +2,11 @@
     <arg name="bot_count" default="1"/>
     <arg name="loc_system_offset_x" default="0"/>
     <arg name="loc_system_offset_y" default="0"/>
+    <arg name="loc_system_rotation_angle" default="0" />
     <arg name="loc_system_scale_x" default="1"/>
     <arg name="loc_system_scale_y" default="1"/>
-
     <arg name="loc_system_name" default="fakelocalisationDefaultName" />
+
     <arg name="target_multiplicative_noise_translation_sigma" default="0"/>
     <arg name="target_additive_noise_translation_sigma" default="0"/>
     <arg name="target_multiplicative_noise_rotation_sigma" default="0"/>
@@ -16,13 +17,15 @@
     <arg name="meta_has_orientation" default="false"/>
     <arg name="meta_correct_mapping" default="false"/>
     <arg name="meta_accuracy" default="1"/>
+
     <node name="$(arg loc_system_name)" pkg="fake_localisation" type="fakeLocalisation.py" args="$(arg loc_system_name)" respawn="false" output="screen">
       <param name="bot_count" type="int" value="$(arg bot_count)"/>
       <param name="loc_system_offset_x" type="double" value="$(arg loc_system_offset_x)"/>
       <param name="loc_system_offset_y" type="double" value="$(arg loc_system_offset_y)"/>
       <param name="loc_system_scale_x" type="double" value="$(arg loc_system_scale_x)"/>
       <param name="loc_system_scale_y" type="double" value="$(arg loc_system_scale_y)"/>
-      <param name="loc_system_name" type="string" value="$(arg loc_system_name)"/>
+      <!--<param name="loc_system_name" type="string" value="$(arg loc_system_name)"/> -->
+      <param name="loc_system_rotation_angle" type="double" value="$(arg loc_system_rotation_angle)"/>
 
       <param name="target_multiplicative_noise_translation_sigma" type="double" value="$(arg target_multiplicative_noise_translation_sigma)"/>
       <param name="target_additive_noise_translation_sigma" type="double" value="$(arg target_additive_noise_translation_sigma)"/>
