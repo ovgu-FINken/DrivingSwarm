@@ -4,6 +4,7 @@
     <arg name="loc_system_offset_y" default="0"/>
     <arg name="loc_system_scale_x" default="1"/>
     <arg name="loc_system_scale_y" default="1"/>
+
     <arg name="loc_system_name" default="fakelocalisationDefaultName" />
     <arg name="target_multiplicative_noise_translation_sigma" default="0"/>
     <arg name="target_additive_noise_translation_sigma" default="0"/>
@@ -11,6 +12,10 @@
     <arg name="target_additive_noise_rotation_sigma" default="0"/>
     <arg name="target_scale_x" default="1"/>
     <arg name="target_scale_y" default="1"/>
+
+    <arg name="meta_has_orientation" default="false"/>
+    <arg name="meta_correct_mapping" default="false"/>
+    <arg name="meta_accuracy" default="1"/>
     <node name="$(arg loc_system_name)" pkg="fake_localisation" type="fakeLocalisation.py" args="$(arg loc_system_name)" respawn="false" output="screen">
       <param name="bot_count" type="int" value="$(arg bot_count)"/>
       <param name="loc_system_offset_x" type="double" value="$(arg loc_system_offset_x)"/>
@@ -18,11 +23,16 @@
       <param name="loc_system_scale_x" type="double" value="$(arg loc_system_scale_x)"/>
       <param name="loc_system_scale_y" type="double" value="$(arg loc_system_scale_y)"/>
       <param name="loc_system_name" type="string" value="$(arg loc_system_name)"/>
+
       <param name="target_multiplicative_noise_translation_sigma" type="double" value="$(arg target_multiplicative_noise_translation_sigma)"/>
       <param name="target_additive_noise_translation_sigma" type="double" value="$(arg target_additive_noise_translation_sigma)"/>
       <param name="target_multiplicative_noise_rotation_sigma" type="double" value="$(arg target_multiplicative_noise_rotation_sigma)"/>
       <param name="target_additive_noise_rotation_sigma" type="double" value="$(arg target_additive_noise_rotation_sigma)"/>
       <param name="target_scale_x" type="double" value="$(arg target_scale_x)"/>
       <param name="target_scale_y" type="double" value="$(arg target_scale_y)"/>
+
+      <param name="meta_has_orientation" type="boolean" value="$(arg meta_has_orientation)"/>
+      <param name="meta_correct_mapping" type="boolean" value="$(arg meta_correct_mapping)"/>
+      <param name="meta_accuracy" type="double" value="$(arg meta_accuracy)"/>
     </node>
   </launch>

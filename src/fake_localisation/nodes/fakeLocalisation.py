@@ -12,6 +12,7 @@ from geometry_msgs.msg import Vector3, Quaternion, Transform, TransformStamped
 #from fake_localisation.msg import localisation_meta
 from localisation_msgs.msg import localisation_meta
 
+mapping = []
 
 def create_tf(tf_broadcaster, parent, child, transform):
     if(type(transform) is not tuple):
@@ -69,10 +70,10 @@ def add_noise_to_transformation(transformation):
 def update_tf(tf_buffer, tf_broadcaster, bot_count, locSystemName):
         for id in range(0, bot_count):
             try: #get tf from loc_system_locSytemName -> World -> .. -> tb3_id/base_footprint
-                transform_msg = tf_buffer.lookup_transform("loc_system_" + locSystemName, 'tb3_' + str(id) + '/base_footprint', rospy.Time(0))
+                transform_msg = tf_buffer.lookup_transform("loc_system_" + locSystemName, 'tb3_' + mapping[id] + '/base_footprint', rospy.Time(0))
             except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
                 continue #if not possible try next
-	    transformation_scaled = scale_transformation(transform_msg.transform)
+	        transformation_scaled = scale_transformation(transform_msg.transform)
             transformation_with_noise = add_noise_to_transformation(transformation_scaled)
 
             #loc_system -> target
@@ -84,16 +85,19 @@ def update_tf(tf_buffer, tf_broadcaster, bot_count, locSystemName):
         create_tf(tf_broadcaster, 'world', "loc_system_" + locSystemName,
                          (create_transform_msg((loc_system_offset_x, loc_system_offset_y, 0), (0, 0, 0, 1))))
 
-def publish_metadata(has_orientation, correct_mapping):
-# old
-   # topic_has_orientation.publish(has_orientation)
-   # topic_correct_mapping.publish(correct_mapping)
-#new
+def publish_metadata(has_orientation, correct_mapping, accuracy):
     localisation_meta_msg = localisation_meta()
     localisation_meta_msg.has_orientation = True
     localisation_meta_msg.correct_mapping = True
-    localisation_meta_msg.accuracy = 1
+    localisation_meta_msg.accuracy = accuracy
     topic_metadata.publish(localisation_meta_msg);
+
+def genMapping(bot_count, correct_mapping = False):
+    mapping = np.arange(0, bot_count)
+    if correct_mapping:
+       return np.array(mapping).astype('str')
+    else:
+       return np.array(np.random.permutation(mapping)).astype('str')
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
@@ -108,7 +112,8 @@ if __name__ == '__main__':
     loc_system_offset_y = rospy.get_param('~loc_system_offset_y')
     loc_system_scale_x = rospy.get_param('~loc_system_scale_x')
     loc_system_scale_y = rospy.get_param('~loc_system_scale_y')
-    loc_system_name = rospy.get_param('~loc_system_name') #"fakelocalisation"
+    loc_system_name = rospy.get_param('~loc_system_name') 
+
     target_random_multiplicative_noise_translation_sigma = rospy.get_param('~target_multiplicative_noise_translation_sigma')
     target_random_additive_noise_translation_sigma = rospy.get_param('~target_additive_noise_translation_sigma')
     target_random_multiplicative_noise_rotation_sigma = rospy.get_param('~target_multiplicative_noise_rotation_sigma')
@@ -116,9 +121,13 @@ if __name__ == '__main__':
     target_scale_x = rospy.get_param('~target_scale_x')
     target_scale_y = rospy.get_param('~target_scale_y')
 
+    meta_has_orientation = rospy.get_param('~meta_has_orientation')
+    meta_correct_mapping = rospy.get_param('~meta_correct_mapping')
+    meta_accuracy = rospy.get_param('~meta_accuracy')
+
     #create topic publisher
-    topic_has_orientation = rospy.Publisher('loc_system_meta_' + loc_system_name + '/has_orientation', Int8, queue_size=1)
-    topic_correct_mapping = rospy.Publisher('loc_system_meta_' + loc_system_name + '/correct_mapping', Int8, queue_size=1)
+    #topic_has_orientation = rospy.Publisher('loc_system_meta_' + loc_system_name + '/has_orientation', Int8, queue_size=1)
+    #topic_correct_mapping = rospy.Publisher('loc_system_meta_' + loc_system_name + '/correct_mapping', Int8, queue_size=1)
     topic_metadata = rospy.Publisher('loc_system_meta_' + loc_system_name, localisation_meta,  queue_size=1)
     
     #create tf buffer
@@ -127,11 +136,10 @@ if __name__ == '__main__':
     #create tf broadcaster
     tf_broadcaster = tf2_ros.TransformBroadcaster()
 
-    has_orientation = True
-    correct_mapping = True
+    mapping = genMapping(bot_count, meta_correct_mapping)
 
     rate = rospy.Rate(100.0)
     while not rospy.is_shutdown():
         update_tf(tf_buffer, tf_broadcaster, bot_count, loc_system_name)
-        publish_metadata(has_orientation, correct_mapping)
+        publish_metadata(meta_has_orientation, meta_correct_mapping, meta_accuracy)
         rate.sleep()
