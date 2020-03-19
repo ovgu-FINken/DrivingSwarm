@@ -6,6 +6,7 @@ import tf2_ros
 import geometry_msgs.msg
 from std_msgs.msg import Int8, Int32, Float64
 import numpy as np
+import sys
 
 from geometry_msgs.msg import Vector3, Quaternion, Transform, TransformStamped
 #from fake_localisation.msg import localisation_meta
@@ -95,7 +96,11 @@ def publish_metadata(has_orientation, correct_mapping):
     topic_metadata.publish(localisation_meta_msg);
 
 if __name__ == '__main__':
-    rospy.init_node("fakelocalisation", anonymous=True) # can not use the parameter loc_system_name: since the name has to be choosen first
+    if len(sys.argv) < 2:
+        print("please pass name as arg, using default: fakelocalisation")
+        rospy.init_node("fakelocalisation")
+    else:
+        rospy.init_node(sys.argv[1])
 
     #load all parameters:
     bot_count = rospy.get_param('~bot_count')

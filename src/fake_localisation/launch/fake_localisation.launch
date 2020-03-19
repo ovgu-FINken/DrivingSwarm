@@ -4,14 +4,14 @@
     <arg name="loc_system_offset_y" default="0"/>
     <arg name="loc_system_scale_x" default="1"/>
     <arg name="loc_system_scale_y" default="1"/>
+    <arg name="loc_system_name" default="fakelocalisationDefaultName" />
     <arg name="target_multiplicative_noise_translation_sigma" default="0"/>
     <arg name="target_additive_noise_translation_sigma" default="0"/>
     <arg name="target_multiplicative_noise_rotation_sigma" default="0"/>
     <arg name="target_additive_noise_rotation_sigma" default="0"/>
     <arg name="target_scale_x" default="1"/>
     <arg name="target_scale_y" default="1"/>
-    <arg name="loc_system_name" default="fakelocalisationDefaultName" />
-    <node name="fake_localisation" pkg="fake_localisation" type="fakeLocalisation.py" respawn="false" output="screen">
+    <node name="$(arg loc_system_name)" pkg="fake_localisation" type="fakeLocalisation.py" args="$(arg loc_system_name)" respawn="false" output="screen">
       <param name="bot_count" type="int" value="$(arg bot_count)"/>
       <param name="loc_system_offset_x" type="double" value="$(arg loc_system_offset_x)"/>
       <param name="loc_system_offset_y" type="double" value="$(arg loc_system_offset_y)"/>
