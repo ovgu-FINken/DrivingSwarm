@@ -1,0 +1,12 @@
+<launch>
+    <group ns="fake_UWB">
+        <include file="$(find fake_localisation)/launch/fake_localisation.launch">
+            <arg name="loc_system_name" value="fake_UWB" />
+        </include>
+    </group>
+    <group ns="fake_camera">
+        <include file="$(find fake_localisation)/launch/fake_localisation.launch">
+            <arg name="loc_system_name" value="fake_camera" />
+        </include>
+    </group>
+</launch>
