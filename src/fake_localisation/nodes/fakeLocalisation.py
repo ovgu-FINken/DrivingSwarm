@@ -70,10 +70,10 @@ def add_noise_to_transformation(transformation):
 
 # reads TF from simulation and updates TF
 def update_tf(tf_buffer, tf_broadcaster, bot_count, locSystemName, loc_system_rotation_angle):
-        for id in range(bot_count):
+        for id in range(bot_count): #0,1,2,..N-1
             try: #get tf from loc_system_locSytemName -> World -> .. -> tb3_id/base_footprint
                 #print("Lookup: " +  "loc_system_" + locSystemName + " --> " + 'tb3_' + str(id) + '/base_footprint')
-                transform_msg = tf_buffer.lookup_transform("loc_system_" + locSystemName, 'tb3_' + str(id) + '/base_footprint', rospy.Time(0))
+                transform_msg = tf_buffer.lookup_transform("loc_system_" + locSystemName, 'tb3_' + str(id+1) + '/base_footprint', rospy.Time(0))
             except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
                 continue #if not possible try next
 
@@ -100,11 +100,11 @@ def publish_metadata(has_orientation, correct_mapping, accuracy):
 
 #generates an array from 0 to botcount with rising(correct = true) or random (correct = false) order
 def genMapping(bot_count, correct_mapping = False):
-    mapping = np.arange(0, bot_count)
+    mapping = np.arange(1, bot_count+1)
     if correct_mapping:
        return np.array(mapping).astype('str')
     else:
-       return np.array(np.random.permutation(mapping)).astype('str')
+       return np.random.permutation(np.array(mapping)).astype('str')
 
 if __name__ == '__main__':
 
