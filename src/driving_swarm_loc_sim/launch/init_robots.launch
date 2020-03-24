@@ -1,0 +1,51 @@
+<launch>
+  <arg name="model"
+    default="$(env TURTLEBOT3_MODEL)"
+    doc="model type [burger, waffle, waffle_pi]"/>
+  <arg name="nr" default="1"/>
+  <arg name="robot_name" default="$(eval 'tb3_' + str(arg('nr')))"/>
+  <arg name="init_pose" default="-x 0.0 -y 0.0 -z 0.0"/>
+  <arg name="auto_drive" default="False"/>
+  <arg name="recurse" default="True"/>
+
+  <group ns="$(arg robot_name)">
+
+    <param name="robot_description"
+      command="$(find xacro)/xacro
+        $(find driving_swarm_loc_sim)/urdf/turtlebot3_burger.urdf.xacro
+        laser_frame:=$(arg robot_name)/base_scan"/>
+
+    <node name="spawn_urdf"
+      pkg="gazebo_ros"
+      type="spawn_model"
+      args="$(arg init_pose)
+          -urdf
+          -param robot_description
+          -model $(arg robot_name)"
+      respawn="false" output="screen"/>
+
+    <include file="$(find turtlebot3_gazebo)/launch/turtlebot3_simulation.launch"
+        if="$(arg auto_drive)">
+      <arg name="cmd_vel" value="/$(arg robot_name)/cmd_vel"/>
+    </include>
+
+    <!-- TurtleBot3 -->
+    <include file="$(find turtlebot3_bringup)/launch/turtlebot3_remote.launch">
+      <arg name="model" value="$(arg model)" />
+      <arg name="multi_robot_name" value="$(arg robot_name)"/>
+    </include>
+
+    <!-- Localization -->
+    <include file="$(find driving_swarm_loc_sim)/launch/amcl.launch">
+      <arg name="robot_name" value="$(arg robot_name)"/>
+    </include>
+  </group>
+
+  <!-- Recursively include this launch file until nr=1 -->
+  <include file="$(find driving_swarm_loc_sim)/launch/init_robots.launch"
+    if="$(eval arg('nr') > 1 and arg('recurse'))">
+    <arg name="init_pose" value="$(arg init_pose)"/>
+    <arg name="nr" value="$(eval arg('nr') - 1)"/>
+	<arg name="auto_drive" value="$(arg auto_drive)"/>
+  </include>
+</launch>

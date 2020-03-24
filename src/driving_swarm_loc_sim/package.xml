@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>driving_swarm_loc_sim</name>
+  <version>0.0.0</version>
+  <description>The driving_swarm_loc_sim package</description>
+  <maintainer email="nico@todo.todo">nico</maintainer>
+
+  <license>TODO</license>
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <export>
+    <gazebo_ros gazebo_media_path="${prefix}" gazebo_model_path="${prefix}/models"/>
+  </export>
+
+</package>

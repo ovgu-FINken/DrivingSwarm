@@ -1,0 +1,38 @@
+<launch>
+  <arg name="map_path" default="$(find pheromone_map)/maps/arena_one.yaml"/>
+  <arg name="world_name" default="arena_one"/>
+  <arg name="robot_amount" default="1"/>
+  <arg name="init_pose" default="-x 0.0 -y 0.0 -z 0.0"/>
+  <arg name="auto_drive" default="False"/>
+
+  <node pkg="map_server"
+    name="map_server"
+    type="map_server"
+    args="$(arg map_path)">
+  </node>
+
+  <node pkg="tf" type="static_transform_publisher" name="world_to_map_tf_broadcaster"  args="0 0 0 0 0 0 /map /world 100"/>
+
+  <include file="$(find fake_localisation)/launch/fake_localisation.launch">
+    <arg name="loc_system_name" value="fake_UWB" />
+    <arg name="bot_count" value="3" />
+  </include>
+  <include file="$(find fake_localisation)/launch/fake_localisation.launch">
+    <arg name="loc_system_name" value="fake_camera" />
+    <arg name="bot_count" value="3" />
+  </include>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find driving_swarm_loc_sim)/worlds/$(arg world_name).world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <include file="$(find driving_swarm_loc_sim)/launch/init_robots.launch">
+    <arg name="init_pose" value="$(arg init_pose)"/>
+    <arg name="nr" value="$(arg robot_amount)"/>
+	<arg name="auto_drive" value="$(arg auto_drive)"/>
+  </include>
+</launch>
