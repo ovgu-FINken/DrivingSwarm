@@ -1,0 +1,59 @@
+#!/usr/bin/env python
+import rospy
+import tf2_ros
+import yaml
+
+def find_frames(frames, prefix):
+    target_frames = []
+
+    for k,v in frames.items():
+        if prefix in k:
+            target_frames.append(k)
+
+    return target_frames
+
+def correlate_frames(frames_one, frames_two, tfbuffer):
+    correlations = {}
+    for f1 in frames_one:
+        min_error = float("inf")
+        for f2 in frames_two:
+            f1_to_f2 = tfBuffer.lookup_transform(f1, f2, rospy.Time())
+            trans = f1_to_f2.transform.translation
+            error = trans.x ** 2 + trans.y ** 2
+            if error < min_error:
+                min_error = error
+                correlations[f1] = f2
+
+    return correlations
+
+
+def find_transforms(frames, pattern):
+    transforms = {}
+    for k,v in frames.items():
+        if pattern in k:
+            transforms[v["parent"]] = k
+
+    return transforms
+
+if __name__ == '__main__':
+    rospy.init_node('transform_correlator')
+
+    loc_system_one = rospy.get_param('~loc_system_one')
+    loc_system_two = rospy.get_param('~loc_system_two')
+
+
+    tfBuffer = tf2_ros.Buffer()
+    listener = tf2_ros.TransformListener(tfBuffer)
+
+    rate = rospy.Rate(1)
+    while not rospy.is_shutdown():
+        frames = tfBuffer.all_frames_as_yaml()
+        frames = yaml.load(frames)
+
+        frames_s_one = find_frames(frames, loc_system_one)
+        frames_s_two = find_frames(frames, loc_system_two)
+
+        correlations = correlate_frames(frames_s_one, frames_s_two, tfBuffer)
+        turtle_targets = find_transforms(frames, "tb3_")
+        print(correlations)
+        rate.sleep()
