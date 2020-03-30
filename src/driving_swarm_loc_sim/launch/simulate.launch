@@ -39,4 +39,9 @@
     <arg name="nr" value="$(arg robot_amount)"/>
 	<arg name="auto_drive" value="$(arg auto_drive)"/>
   </include>
+
+  <include file="$(find fake_localisation)/launch/fakeUwbTurtlebotAssing.launch">
+    <arg name="bot_count" value="$(arg robot_amount)" />
+  </include>
+  
 </launch>

@@ -1,0 +1,26 @@
+<launch>
+  <arg name="bot_count" default="1"/>
+  <arg name="update_rate" default="1.0"/>
+  <arg name="uwb_tf_prefix" default="loc_system_fake_UWB/"/>
+
+
+  <node name="fakeUwbTurtlebotAssing" pkg="fake_localisation" type="fakeUwbTurtlebotAssing.py" respawn="false" output="screen">
+    <param name="bot_count" type="int" value="$(arg bot_count)"/>
+    <param name="update_rate" type="double" value="$(arg update_rate)"/>
+    <param name="uwb_tf_prefix" type="string" value="$(arg uwb_tf_prefix)"/>
+    <rosparam param="tb3_module_id_dict">
+      {
+      tb3_1: 1,
+      tb3_2: 2,
+      tb3_3: 3,
+      tb3_4: 4,
+      tb3_5: 5,
+      tb3_6: 6,
+      tb3_7: 7,
+      tb3_8: 8,
+      tb3_9: 9,
+      tb3_10: 10
+      }
+    </rosparam>
+  </node>
+</launch>
