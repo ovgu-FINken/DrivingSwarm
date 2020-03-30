@@ -114,7 +114,7 @@ if __name__ == '__main__':
         loc_system_name = "fakelocalisation"
     else:
         loc_system_name = sys.argv[1]
-        
+
     rospy.init_node(loc_system_name)
 
     #read all local parameters:
@@ -132,13 +132,15 @@ if __name__ == '__main__':
     target_scale_x = rospy.get_param('~target_scale_x')
     target_scale_y = rospy.get_param('~target_scale_y')
 
+    update_rate = rospy.get_param('~update_rate')
+
     meta_has_orientation = rospy.get_param('~meta_has_orientation')
     meta_correct_mapping = rospy.get_param('~meta_correct_mapping')
     meta_accuracy = rospy.get_param('~meta_accuracy')
 
     #create topic publisher
     topic_metadata = rospy.Publisher('loc_system_meta_' + loc_system_name, localisation_meta,  queue_size=1)
-    
+
     #create tf buffer
     tf_buffer = tf2_ros.Buffer()
     tf2_ros.TransformListener(tf_buffer)
@@ -149,7 +151,7 @@ if __name__ == '__main__':
     #generate target mapping (random/correct)
     mapping = genMapping(bot_count, meta_correct_mapping)
 
-    rate = rospy.Rate(100.0) #100Hz
+    rate = rospy.Rate(update_rate) #Hz
 
     #main loop:
     while not rospy.is_shutdown():

@@ -14,6 +14,8 @@
     <arg name="target_scale_x" default="1"/>
     <arg name="target_scale_y" default="1"/>
 
+    <arg name="update_rate" default="100.0"/>
+
     <arg name="meta_has_orientation" default="false"/>
     <arg name="meta_correct_mapping" default="false"/>
     <arg name="meta_accuracy" default="1"/>
@@ -33,6 +35,8 @@
       <param name="target_additive_noise_rotation_sigma" type="double" value="$(arg target_additive_noise_rotation_sigma)"/>
       <param name="target_scale_x" type="double" value="$(arg target_scale_x)"/>
       <param name="target_scale_y" type="double" value="$(arg target_scale_y)"/>
+
+      <param name="update_rate" type="double" value="$(arg update_rate)"/>
 
       <param name="meta_has_orientation" type="boolean" value="$(arg meta_has_orientation)"/>
       <param name="meta_correct_mapping" type="boolean" value="$(arg meta_correct_mapping)"/>
