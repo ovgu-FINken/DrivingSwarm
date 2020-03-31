@@ -1,48 +1,84 @@
 #!/usr/bin/env python
+
+# The source system needs to have null transformations from the targets to
+# the associated turtlebot
+# This node will the find the nearest neighbor of every target in the source
+# system in the target system and then also publish a null transoformation
+# from the target in the target system to the associated turtlebot
+
 import rospy
 import tf2_ros
 import yaml
+import geometry_msgs.msg
 
-def find_frames(frames, prefix):
+def find_frames(frames, prefix, target_string):
     target_frames = []
 
     for k,v in frames.items():
-        if prefix in k:
+        if prefix in k and target_string in k and prefix in v["parent"]:
             target_frames.append(k)
 
     return target_frames
 
-def correlate_frames(frames_one, frames_two, tfbuffer):
+def correlate_frames(frames_source, frames_target, tfbuffer):
     correlations = {}
-    for f1 in frames_one:
+    for f_source in frames_source:
         min_error = float("inf")
-        for f2 in frames_two:
+        for f_target in frames_target:
             try:
-                f1_to_f2 = tfBuffer.lookup_transform(f1, f2, rospy.Time())
-            except tf2_ros.ConnectivityException:
+                f_source_to_f_target = tfBuffer.lookup_transform(f_source, f_target, rospy.Time())
+            except tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException:
                 continue
-            trans = f1_to_f2.transform.translation
+            trans = f_source_to_f_target.transform.translation
             error = trans.x ** 2 + trans.y ** 2
             if error < min_error:
                 min_error = error
-                correlations[f1] = f2
+                correlations[f_source] = f_target
 
     return correlations
 
 
-def find_transforms(frames, pattern):
+def find_targets(frames, loc_system_pattern, target_pattern):
     transforms = {}
     for k,v in frames.items():
-        if pattern in k:
-            transforms[v["parent"]] = k
+        if target_pattern in k and loc_system_pattern in k:
+            transforms[v["parent"]] = k.replace(loc_system_pattern + '/' , '')
 
     return transforms
+
+
+
+def send_transform(_from, _to):
+    br = tf2_ros.TransformBroadcaster()
+    t = geometry_msgs.msg.TransformStamped()
+
+    t.header.stamp = rospy.Time.now()
+    t.header.frame_id = _from
+    t.child_frame_id = _to
+    t.transform.translation.x = 0.0
+    t.transform.translation.y = 0.0
+    t.transform.translation.z = 0.0
+    t.transform.rotation.x = 0.0
+    t.transform.rotation.y = 0.0
+    t.transform.rotation.z = 0.0
+    t.transform.rotation.w = 1.0
+
+    br.sendTransform(t)
+    return
+
+
+def publish_transforms(correlations, target_frames, prefix):
+    for target, associated_bot in target_frames.items():
+        correlated_target = correlations.get(target, False)
+        if correlated_target:
+            send_transform(correlated_target, prefix + '/' + associated_bot)
+
 
 if __name__ == '__main__':
     rospy.init_node('transform_correlator')
 
-    loc_system_one = rospy.get_param('~loc_system_one')
-    loc_system_two = rospy.get_param('~loc_system_two')
+    loc_system_source = rospy.get_param('~loc_system_source')
+    loc_system_target = rospy.get_param('~loc_system_target')
 
 
     tfBuffer = tf2_ros.Buffer()
@@ -53,10 +89,15 @@ if __name__ == '__main__':
         frames = tfBuffer.all_frames_as_yaml()
         frames = yaml.load(frames)
 
-        frames_s_one = find_frames(frames, loc_system_one)
-        frames_s_two = find_frames(frames, loc_system_two)
+        frames_s_source = find_frames(frames, loc_system_source, 'target')
+        frames_s_target = find_frames(frames, loc_system_target, 'target')
 
-        correlations = correlate_frames(frames_s_one, frames_s_two, tfBuffer)
-        turtle_targets = find_transforms(frames, "tb3_")
-        print(correlations)
+        # Find correlating targets between loc systems
+        correlations = correlate_frames(frames_s_source, frames_s_target, tfBuffer)
+
+        # Find all targets already assigned to a turtlebot in source system
+        turtle_targets = find_targets(frames, loc_system_source, "tb3_")
+
+        # Transfer target assocations to target loc system and publish
+        publish_transforms(correlations, turtle_targets, loc_system_target)
         rate.sleep()

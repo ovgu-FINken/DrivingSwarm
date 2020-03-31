@@ -27,8 +27,8 @@
   </include>
 
   <node pkg="driving_swarm_loc" type="transform_correlator" name="transform_correlator" output="screen">
-	<param name="loc_system_one" value="loc_system_fake_UWB"/>
-	<param name="loc_system_two" value="loc_system_fake_camera"/>
+	<param name="loc_system_source" value="loc_system_fake_UWB"/>
+	<param name="loc_system_target" value="loc_system_fake_camera"/>
   </node>
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
