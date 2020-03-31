@@ -26,6 +26,11 @@
     <arg name="bot_count" value="$(arg robot_amount)" />
   </include>
 
+  <node pkg="driving_swarm_loc" type="transform_correlator" name="transform_correlator" output="screen">
+	<param name="loc_system_one" value="loc_system_fake_UWB"/>
+	<param name="loc_system_two" value="loc_system_fake_camera"/>
+  </node>
+
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find driving_swarm_loc_sim)/worlds/$(arg world_name).world"/>
     <arg name="paused" value="false"/>
