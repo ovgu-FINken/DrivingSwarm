@@ -17,7 +17,10 @@ def correlate_frames(frames_one, frames_two, tfbuffer):
     for f1 in frames_one:
         min_error = float("inf")
         for f2 in frames_two:
-            f1_to_f2 = tfBuffer.lookup_transform(f1, f2, rospy.Time())
+            try:
+                f1_to_f2 = tfBuffer.lookup_transform(f1, f2, rospy.Time())
+            except tf2_ros.ConnectivityException:
+                continue
             trans = f1_to_f2.transform.translation
             error = trans.x ** 2 + trans.y ** 2
             if error < min_error:
