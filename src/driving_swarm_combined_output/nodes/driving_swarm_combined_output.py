@@ -10,17 +10,29 @@ import sys
 from geometry_msgs.msg import Vector3, Quaternion, Transform, TransformStamped
 from driving_swarm_msgs.msg import localisation_meta
 
+def broadcast_tf(tf_broadcaster, parent, child, transform):
+        t = geometry_msgs.msg.TransformStamped()
+        t.header.stamp = rospy.Time.now()
+        t.header.frame_id = parent
+        t.child_frame_id = child
+        t.transform = transform
+        tf_broadcaster.sendTransform(t)
+
 def update_tf(tf_buffer, tf_broadcaster, bot_count):
         for id in range(bot_count): #0,1,2,..N-1
-            try: #get tf from loc_system_locSytemName -> World -> .. -> tb3_id/base_footprint
-                #print("Lookup: " +  "loc_system_" + locSystemName + " --> " + 'tb3_' + str(id) + '/base_footprint')
-                #TODO: choose locSystem
-                transform_msg = tf_buffer.lookup_transform("world", 'loc_system_fake_camera/target' + str(id+1), rospy.Time(0))
+            try: # lookup from world to loc_system_XX/targetN
+                tf_from = "world"
+                tf_to = "loc_system_fake_camera/target" + str(id+1)
+                transform_msg = tf_buffer.lookup_transform(tf_from, tf_to, rospy.Time(0))
             except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
                 continue #if not possible try next
 
-            #TF: world -> target
-            broadcast_tf(tf_broadcaster, "world", "tb_" + str(id+1), transform_msg)
+            #TF: publish tf form world -> tb_N
+            transform_msg.header.stamp = rospy.Time.now()
+            transform_msg.header.frame_id = tf_from
+            transform_msg.child_frame_id = "tb_" + str(id+1)
+            tf_broadcaster.sendTransform(transform_msg)
+            #print("SendTransform from " + transform_msg.header.frame_id +" to "+ transform_msg.child_frame_id)
         
 
 def publish_metadata(has_orientation, correct_mapping, accuracy):

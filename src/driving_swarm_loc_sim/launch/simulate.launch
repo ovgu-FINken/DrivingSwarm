@@ -21,8 +21,13 @@
     <arg name="update_rate" value="3" />
     <arg name="meta_accuracy" value="0.8" />
   </include>
+
   <include file="$(find driving_swarm_fake_localisation)/launch/fake_localisation.launch">
     <arg name="loc_system_name" value="fake_camera" />
+    <arg name="bot_count" value="$(arg robot_amount)" />
+  </include>
+
+  <include file="$(find driving_swarm_combined_output)/launch/combined_output.launch">
     <arg name="bot_count" value="$(arg robot_amount)" />
   </include>
 
