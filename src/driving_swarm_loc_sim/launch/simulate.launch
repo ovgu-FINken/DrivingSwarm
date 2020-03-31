@@ -31,6 +31,13 @@
     <arg name="bot_count" value="$(arg robot_amount)" />
   </include>
 
+  <include file="$(find driving_swarm_amcl2loctf)/launch/amcl2loctf.launch">
+    <arg name="bot_count" value="$(arg robot_amount)" />
+  </include>
+  
+  
+
+
   <node pkg="driving_swarm_loc" type="transform_correlator" name="transform_correlator" output="screen">
 	<param name="loc_system_source" value="loc_system_fake_UWB"/>
 	<param name="loc_system_target" value="loc_system_fake_camera"/>
