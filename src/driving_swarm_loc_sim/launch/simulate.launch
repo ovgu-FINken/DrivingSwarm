@@ -11,7 +11,7 @@
     args="$(arg map_path)">
   </node>
 
-  <node pkg="tf" type="static_transform_publisher" name="world_to_map_tf_broadcaster"  args="0 0 0 0 0 0 /map /world 100"/>
+  <node pkg="tf" type="static_transform_publisher" name="world_to_map_tf_broadcaster"  args="0 0 0 0 0 0 /world /map 100"/>
 
   <include file="$(find driving_swarm_fake_localisation)/launch/fake_localisation.launch">
     <arg name="loc_system_name" value="fake_UWB" />
