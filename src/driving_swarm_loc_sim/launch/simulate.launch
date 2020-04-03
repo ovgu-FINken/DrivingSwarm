@@ -27,9 +27,15 @@
     <arg name="bot_count" value="$(arg robot_amount)" />
   </include>
 
-  <include file="$(find driving_swarm_loc)/launch/combined_output.launch">
-    <arg name="bot_count" value="$(arg robot_amount)" />
-  </include>
+  <node name="driving_swarm_combined_output" pkg="driving_swarm_loc" type="combined_output.py" args="" respawn="false" output="screen">
+    <rosparam param="loc_systems">
+        {
+         loc_system_fake_UWB: {weight: 0.3},
+         loc_system_fake_camera: {weight: 1},
+         loc_system_AMCL: {weight: 1}
+        }
+    </rosparam>
+  </node>
 
   <include file="$(find driving_swarm_loc)/launch/amcl2loctf.launch">
     <arg name="bot_count" value="$(arg robot_amount)" />
