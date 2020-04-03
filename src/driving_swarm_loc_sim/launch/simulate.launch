@@ -27,20 +27,18 @@
     <arg name="bot_count" value="$(arg robot_amount)" />
   </include>
 
-  <include file="$(find driving_swarm_combined_output)/launch/combined_output.launch">
+  <include file="$(find driving_swarm_loc)/launch/combined_output.launch">
     <arg name="bot_count" value="$(arg robot_amount)" />
   </include>
 
-  <include file="$(find driving_swarm_amcl2loctf)/launch/amcl2loctf.launch">
+  <include file="$(find driving_swarm_loc)/launch/amcl2loctf.launch">
     <arg name="bot_count" value="$(arg robot_amount)" />
   </include>
-  
-  
 
 
   <node pkg="driving_swarm_loc" type="transform_correlator" name="transform_correlator" output="screen">
-	<param name="loc_system_source" value="loc_system_fake_UWB"/>
-	<param name="loc_system_target" value="loc_system_fake_camera"/>
+    <param name="loc_system_source" value="loc_system_fake_UWB"/>
+    <param name="loc_system_target" value="loc_system_fake_camera"/>
   </node>
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -54,11 +52,11 @@
   <include file="$(find driving_swarm_loc_sim)/launch/init_robots.launch">
     <arg name="init_pose" value="$(arg init_pose)"/>
     <arg name="nr" value="$(arg robot_amount)"/>
-	<arg name="auto_drive" value="$(arg auto_drive)"/>
+    <arg name="auto_drive" value="$(arg auto_drive)"/>
   </include>
 
   <include file="$(find driving_swarm_fake_localisation)/launch/fakeUwbTurtlebotAssing.launch">
     <arg name="bot_count" value="$(arg robot_amount)" />
   </include>
-  
+
 </launch>
