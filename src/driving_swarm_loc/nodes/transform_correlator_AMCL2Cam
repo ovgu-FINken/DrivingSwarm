@@ -1,0 +1,112 @@
+#!/usr/bin/env python
+
+import rospy
+import tf_conversions
+from tf.transformations import quaternion_from_euler, euler_from_quaternion
+import tf2_ros
+import geometry_msgs.msg
+from std_msgs.msg import Int8, Int32, Float64
+import numpy as np
+import sys
+from geometry_msgs.msg import Vector3, Quaternion, Transform, TransformStamped
+from driving_swarm_msgs.msg import localisation_meta
+import math
+
+def lookup_transforms(tf_from, tf_to, bot_count):
+    replaceString = '##' # use '##' as placeholder for the bot-id
+    result = []
+    for id in range(bot_count): #0,1,2,..N-1
+        tf_to_inserted_id = tf_to.replace(replaceString, str(id+1))
+        tf_from_inserted_id = tf_from.replace(replaceString, str(id+1))
+        transformation_msg = lookup_transform_withoutExeption(tf_from_inserted_id, tf_to_inserted_id)
+        if transformation_msg:
+            result.append(transformation_msg)
+    return result
+
+def lookup_transform_withoutExeption(tf_from, tf_to):
+    try: transform_msg = tf_buffer.lookup_transform(tf_from, tf_to, rospy.Time(0))
+    except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+        print("No Translation found from '" + tf_from + "' to '" + tf_to + "'")
+        return
+    return transform_msg    
+    
+def calc_mean_point(transform_msgs):
+    sumX = 0
+    sumY = 0
+    iterations = 0
+    for msg in transform_msgs:
+        sumX += msg.transform.translation.x
+        sumY += msg.transform.translation.y 
+        iterations += 1
+    return sumX/iterations, sumY/iterations
+
+def calc_translation(transform_msgs1, transform_msgs2):
+    mean1X, mean1Y = calc_mean_point(transform_msgs1)
+    mean2X, mean2Y = calc_mean_point(transform_msgs2)
+    return mean2X - mean1X, mean2Y - mean1Y  
+
+def find_rotation(transform_msgs1, transform_msgs2, translationX, translationY):
+    #msg.transform.translation.x/y
+    distance_min = 10**15 +0.1
+    angle_min_distance = 10.0
+    for angle in range(360):
+        sum_distances = 0
+        for i in range(len(transform_msgs1)):
+            sum_distances += math.sqrt((transform_msgs1[i].transform.translation.x-transform_msgs2[i].transform.translation.x)**2 +
+                             (transform_msgs1[i].transform.translation.y-transform_msgs2[i].transform.translation.y)**2)
+        if sum_distances < distance_min:
+            distance_min = sum_distances
+            angle_min_distance = angle
+
+    return angle_min_distance;
+
+def create_transform_msg((x,y,z),(qx,qy,qz,qw)):
+    t = Transform(Vector3(x,y,z), Quaternion(qx,qy,qz,qw))
+    return t
+    
+def broadcast_tf(tf_broadcaster, parent, child, transform):
+    t = geometry_msgs.msg.TransformStamped()
+    t.header.stamp = rospy.Time.now()
+    t.header.frame_id = parent
+    t.child_frame_id = child
+    t.transform = transform
+    tf_broadcaster.sendTransform(t)
+
+def update_tf(bot_count):
+   
+    transforms_world_cam_tb = lookup_transforms("world", "loc_system_fake_camera/tb3_##", bot_count)
+    transforms_map_tbN_basefootprint = lookup_transforms("map", "tb3_##/base_footprint", bot_count)
+
+    if transforms_world_cam_tb and transforms_map_tbN_basefootprint and len(transforms_map_tbN_basefootprint) == len(transforms_world_cam_tb): #same size
+        
+        #translation
+        translationX, translationY = calc_translation(transforms_world_cam_tb, transforms_map_tbN_basefootprint)
+        print(translationX)
+        print(translationY)
+
+        rotation_angle = find_rotation(transforms_world_cam_tb, transforms_map_tbN_basefootprint, translationX, translationY)
+        print(rotation_angle)
+        print("#")
+        
+        #publish world -> map tf
+        #q = quaternion_from_euler(0, 0, rotation_angle)
+        #broadcast_tf(tf_broadcaster, 'world', "map",
+        #            (create_transform_msg((translationX, translationY, 0), (q[0], q[1], q[2], q[3]))))
+
+if __name__ == '__main__':
+    rospy.init_node("transform_correlator_AMCL2Cam")
+
+    bot_count = rospy.get_param('~bot_count')
+    #create tf buffer
+    tf_buffer = tf2_ros.Buffer()
+    tf2_ros.TransformListener(tf_buffer)
+
+    #create tf broadcaster
+    tf_broadcaster = tf2_ros.TransformBroadcaster()
+
+    rate = rospy.Rate(1) #Hz
+
+    #main loop:
+    while not rospy.is_shutdown():
+        update_tf(bot_count)
+        rate.sleep()
