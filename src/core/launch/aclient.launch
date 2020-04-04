@@ -1,13 +1,15 @@
 <?xml version="1.0"?>
 <launch>
 
-    <group ns="$(env ROS_HOSTNAME)">
+	<arg name="multi_robot_name" value="$(env ROS_HOSTNAME)"/>
 
-        <node name="behaviour_aclient" pkg="core" type="aclient.py" respawn="false">
-            <param name="inter_mode" type="bool" value="False" />
-            <param name="action_timeout" type="int" value="30" />
-        </node>
+	<group ns="$(arg multi_robot_name)">
 
-    </group>
+		<node name="behaviour_aclient" pkg="core" type="aclient.py" respawn="false">
+			<param name="inter_mode" type="bool" value="False" />
+			<param name="action_timeout" type="int" value="30" />
+		</node>
+
+	</group>
 
 </launch>

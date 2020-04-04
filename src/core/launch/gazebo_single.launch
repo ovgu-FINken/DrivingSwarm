@@ -7,7 +7,7 @@
 	<arg name="y_pos" default="-0.5"/>
 	<arg name="z_pos" default="0.0"/>
 
-	<arg name="world_file" default="$(find turtlebot3_gazebo)/worlds/turtlebot3_house.world"/>
+	<arg name="world_file" default="$(find turtlebot3_gazebo)/worlds/turtlebot3_world.world"/>
 
 	<arg name="gazebo_port" default="11355"/>
 
@@ -19,19 +19,19 @@
 		<include file="$(find gazebo_ros)/launch/empty_world.launch">
 			<arg name="world_name" value="$(arg world_file)"/>
 			<arg name="paused" value="false"/>
-			<arg name="use_sim_time" value="true"/>
+			<arg name="use_sim_time" value="false"/>
 			<arg name="gui" value="true"/>
 			<arg name="headless" value="false"/>
 			<arg name="debug" value="false"/>
 		</include>
 
+		<param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
 
 		<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
 			<param name="publish_frequency" type="double" value="50.0" />
 			<param name="tf_prefix" value="$(arg multi_robot_name)" />
 		</node>
 
-		<param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
 		<node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf"  args="-urdf -model turtlebot3_$(arg model) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -param robot_description -gazebo_namespace /$(arg multi_robot_name)/gazebo -robot_namespace /$(arg multi_robot_name)"/>
 
 

@@ -1,63 +1,63 @@
 <?xml version="1.0"?>
 <launch>
 
-  <arg name="multi_robot_name" default="$(env ROS_HOSTNAME)"/>
-  <arg name="slam_method" default="karto" doc="slam type [gmapping, cartographer, hector, karto]"/>
+	<arg name="multi_robot_name" default="$(env ROS_HOSTNAME)"/>
+	<arg name="slam_method" default="karto" doc="slam type [gmapping, cartographer, hector, karto]"/>
 
-  <arg name="cartographer_config_dir" default="$(find turtlebot3_slam)/config"/>
-  <arg name="cartographer_config_file" default="turtlebot3_lds_2d.lua"/>
-  <arg name="cartographer_resolution" default="0.05"/>
+	<arg name="cartographer_config_dir" default="$(find turtlebot3_slam)/config"/>
+	<arg name="cartographer_config_file" default="turtlebot3_lds_2d.lua"/>
+	<arg name="cartographer_resolution" default="0.05"/>
 
-  <arg name="test_gmapping" value="$(eval slam_method == 'gmapping')"/>
-  <arg name="test_cartographer" value="$(eval slam_method == 'cartographer')"/>
-  <arg name="test_hector" value="$(eval slam_method == 'hector')"/>
-  <arg name="test_karto" value="$(eval slam_method == 'karto')"/>
+	<arg name="test_gmapping" value="$(eval slam_method == 'gmapping')"/>
+	<arg name="test_cartographer" value="$(eval slam_method == 'cartographer')"/>
+	<arg name="test_hector" value="$(eval slam_method == 'hector')"/>
+	<arg name="test_karto" value="$(eval slam_method == 'karto')"/>
 
-  <!-- SLAM: Gmapping, Hector -->
-  <include file="$(find turtlebot3_slam)/launch/turtlebot3_$(arg slam_method).launch" if="$(eval (test_gmapping or test_hector))">
+	<!-- SLAM: Gmapping, Hector -->
+	<include file="$(find turtlebot3_slam)/launch/turtlebot3_$(arg slam_method).launch" if="$(eval (test_gmapping or test_hector))">
 
-      <arg if="$(arg test_gmapping)" name="set_base_frame" value="$(arg multi_robot_name)/base_footprint"/>
-      <arg if="$(arg test_gmapping)" name="set_odom_frame" value="$(arg multi_robot_name)/odom"/>
-      <arg if="$(arg test_gmapping)" name="set_map_frame" value="$(arg multi_robot_name)/map"/>
+			<arg if="$(arg test_gmapping)" name="set_base_frame" value="$(arg multi_robot_name)/base_footprint"/>
+			<arg if="$(arg test_gmapping)" name="set_odom_frame" value="$(arg multi_robot_name)/odom"/>
+			<arg if="$(arg test_gmapping)" name="set_map_frame" value="$(arg multi_robot_name)/map"/>
 
-      <arg if="$(arg test_hector)" name="base_frame" value="$(arg multi_robot_name)/base_footprint"/>
-      <arg if="$(arg test_hector)" name="odom_frame" value="$(arg multi_robot_name)/odom"/>
-      <arg if="$(arg test_hector)" name="map_frame"  value="$(arg multi_robot_name)/map"/>
-  </include>
+			<arg if="$(arg test_hector)" name="base_frame" value="$(arg multi_robot_name)/base_footprint"/>
+			<arg if="$(arg test_hector)" name="odom_frame" value="$(arg multi_robot_name)/odom"/>
+			<arg if="$(arg test_hector)" name="map_frame"  value="$(arg multi_robot_name)/map"/>
+	</include>
 
-  <!-- SLAM: Karto -->
-  <node if="$(arg test_karto)" pkg="slam_karto" type="slam_karto" name="slam_karto" output="screen">
-    <rosparam command="load" file="$(find turtlebot3_slam)/config/karto_mapper_params.yaml"/>
-    <param name="base_frame" value="$(arg multi_robot_name)/base_footprint"/>
-    <param name="odom_frame" value="$(arg multi_robot_name)/odom"/>
-    <param name="map_frame" value="$(arg multi_robot_name)/map"/>
-  </node>
+	<!-- SLAM: Karto -->
+	<node if="$(arg test_karto)" pkg="slam_karto" type="slam_karto" name="slam_karto" output="screen">
+		<rosparam command="load" file="$(find turtlebot3_slam)/config/karto_mapper_params.yaml"/>
+		<param name="base_frame" value="$(arg multi_robot_name)/base_footprint"/>
+		<param name="odom_frame" value="$(arg multi_robot_name)/odom"/>
+		<param name="map_frame" value="$(arg multi_robot_name)/map"/>
+	</node>
 
-  <!-- SLAM: Cartographer -->
-  <group if="$(arg test_cartographer)">
-    <!-- cartographer_node -->
-    <node pkg="cartographer_ros" type="cartographer_node" name="cartographer_node"
-          args="-configuration_directory $(arg cartographer_config_dir)
-                -configuration_basename $(arg cartographer_config_file)"
-          output="screen"
-          launch-prefix="bash -c &quot;sed -i 
-                         -e 's%map_frame = \&quot;map\&quot;%map_frame = \&quot;'$(arg multi_robot_name)/map'\&quot;%' 
-                         -e 's%tracking_frame = \&quot;imu_link\&quot;%tracking_frame = \&quot;'$(arg multi_robot_name)'/imu_link\&quot;%'
-                         -e 's%published_frame = \&quot;odom\&quot;%published_frame = \&quot;'$(arg multi_robot_name)'/odom\&quot;%' 
-                         -e 's%odom_frame = \&quot;odom\&quot;%odom_frame = \&quot;'$(arg multi_robot_name)'/odom\&quot;%' 
-                         $(arg cartographer_config_dir)/$(arg cartographer_config_file); $0 $@ &quot;" >
-      <remap from="/imu" to="/$(arg multi_robot_name)/flat_imu"/>
-    </node>
+	<!-- SLAM: Cartographer -->
+	<group if="$(arg test_cartographer)">
+		<!-- cartographer_node -->
+		<node pkg="cartographer_ros" type="cartographer_node" name="cartographer_node"
+					args="-configuration_directory $(arg cartographer_config_dir)
+								-configuration_basename $(arg cartographer_config_file)"
+					output="screen"
+					launch-prefix="bash -c &quot;sed -i
+									 -e 's%map_frame = \&quot;map\&quot;%map_frame = \&quot;'$(arg multi_robot_name)/map'\&quot;%'
+									 -e 's%tracking_frame = \&quot;imu_link\&quot;%tracking_frame = \&quot;'$(arg multi_robot_name)'/imu_link\&quot;%'
+									 -e 's%published_frame = \&quot;odom\&quot;%published_frame = \&quot;'$(arg multi_robot_name)'/odom\&quot;%'
+									 -e 's%odom_frame = \&quot;odom\&quot;%odom_frame = \&quot;'$(arg multi_robot_name)'/odom\&quot;%'
+									 $(arg cartographer_config_dir)/$(arg cartographer_config_file); $0 $@ &quot;" >
+			<remap from="/imu" to="/$(arg multi_robot_name)/flat_imu"/>
+		</node>
 
-    <!-- cartographer_occupancy_grid_node -->
-    <node pkg="cartographer_ros" type="cartographer_occupancy_grid_node"
-          name="cartographer_occupancy_grid_node"
-          args="-resolution $(arg cartographer_resolution)" />
+		<!-- cartographer_occupancy_grid_node -->
+		<node pkg="cartographer_ros" type="cartographer_occupancy_grid_node"
+					name="cartographer_occupancy_grid_node"
+					args="-resolution $(arg cartographer_resolution)" />
 
-    <!-- flat_world_imu_node -->
-    <node pkg="turtlebot3_slam" type="flat_world_imu_node" name="flat_world_imu_node" output="screen">
-      <remap from="imu_in" to="/$(arg multi_robot_name)/imu"/>
-      <remap from="imu_out" to="/$(arg multi_robot_name)/flat_imu"/>
-    </node>
-  </group>
+		<!-- flat_world_imu_node -->
+		<node pkg="turtlebot3_slam" type="flat_world_imu_node" name="flat_world_imu_node" output="screen">
+			<remap from="imu_in" to="/$(arg multi_robot_name)/imu"/>
+			<remap from="imu_out" to="/$(arg multi_robot_name)/flat_imu"/>
+		</node>
+	</group>
 </launch>
