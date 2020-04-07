@@ -41,26 +41,44 @@ def calc_mean_point(transform_msgs):
     return sumX/iterations, sumY/iterations
 
 def calc_translation(transform_msgs1, transform_msgs2):
+    #1: world
+    #2: amcl
     mean1X, mean1Y = calc_mean_point(transform_msgs1)
     mean2X, mean2Y = calc_mean_point(transform_msgs2)
     print("Mean1: x:" + str (mean1X) + "," + str(mean1Y))
     print("Mean2: y:" + str (mean2X) + "," + str(mean2Y))
-    return mean1X - mean2X, mean1Y - mean2Y  
+    return mean1X - mean2X, mean1Y - mean2Y #world -> map
 
 def find_rotation(transform_msgs1, transform_msgs2, translationX, translationY):
-    #msg.transform.translation.x/y
+    
+    world_mean_x, world_mean_y = calc_mean_point(transform_msgs1)
     distance_min = 10**15 +0.1
     angle_min_distance = 10.0
     for angle in range(360):
         sum_distances = 0
+
+        theta = np.radians(angle)
+        c, s = np.cos(theta), np.sin(theta)
+        R = np.array(((c, -s), (s, c)))    
+
         for i in range(len(transform_msgs1)):
-            sum_distances += math.sqrt((transform_msgs1[i].transform.translation.x-transform_msgs2[i].transform.translation.x)**2 +
-                             (transform_msgs1[i].transform.translation.y-transform_msgs2[i].transform.translation.y)**2)
+            #add translation
+            mapX = transform_msgs2[i].transform.translation.x - translationX - world_mean_x
+            mapY = transform_msgs2[i].transform.translation.y - translationY - world_mean_y
+            worldX = transform_msgs1[i].transform.translation.x - world_mean_x
+            worldY = transform_msgs1[i].transform.translation.y - world_mean_y
+
+            mapX, mapY =  R.dot([mapX, mapY])
+            sum_distances += distance(worldX, mapX, worldY, mapY)
+
         if sum_distances < distance_min:
             distance_min = sum_distances
             angle_min_distance = angle
 
     return angle_min_distance;
+
+def distance(x1, x2, y1, y2):
+    return (x1 - x2)**2 + (y1 - y2)**2
 
 def create_transform_msg((x,y,z),(qx,qy,qz,qw)):
     t = Transform(Vector3(x,y,z), Quaternion(qx,qy,qz,qw))
