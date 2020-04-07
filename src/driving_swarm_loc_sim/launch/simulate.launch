@@ -1,5 +1,5 @@
 <launch>
-  <arg name="map_path" default="$(find pheromone_map)/maps/arena_one.yaml"/>
+  <arg name="map_path" default="$(find driving_swarm_loc_sim)/maps/arena_one.yaml"/>
   <arg name="world_name" default="arena_one"/>
   <arg name="robot_amount" default="1"/>
   <arg name="init_pose" default="-x 0.0 -y 0.0 -z 0.0"/>

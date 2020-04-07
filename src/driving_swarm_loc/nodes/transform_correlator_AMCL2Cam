@@ -43,7 +43,9 @@ def calc_mean_point(transform_msgs):
 def calc_translation(transform_msgs1, transform_msgs2):
     mean1X, mean1Y = calc_mean_point(transform_msgs1)
     mean2X, mean2Y = calc_mean_point(transform_msgs2)
-    return mean2X - mean1X, mean2Y - mean1Y  
+    print("Mean1: x:" + str (mean1X) + "," + str(mean1Y))
+    print("Mean2: y:" + str (mean2X) + "," + str(mean2Y))
+    return mean1X - mean2X, mean1Y - mean2Y  
 
 def find_rotation(transform_msgs1, transform_msgs2, translationX, translationY):
     #msg.transform.translation.x/y
@@ -77,8 +79,9 @@ def update_tf(bot_count):
     transforms_world_cam_tb = lookup_transforms("world", "loc_system_fake_camera/tb3_##", bot_count)
     transforms_map_tbN_basefootprint = lookup_transforms("map", "tb3_##/base_footprint", bot_count)
 
+
     if transforms_world_cam_tb and transforms_map_tbN_basefootprint and len(transforms_map_tbN_basefootprint) == len(transforms_world_cam_tb): #same size
-        
+
         #translation
         translationX, translationY = calc_translation(transforms_world_cam_tb, transforms_map_tbN_basefootprint)
         print(translationX)
