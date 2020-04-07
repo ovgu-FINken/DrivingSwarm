@@ -9,6 +9,7 @@ import numpy as np
 import sys
 from geometry_msgs.msg import Vector3, Quaternion, Transform, TransformStamped
 from driving_swarm_msgs.msg import localisation_meta
+from gazebo_msgs.srv import GetModelState
 
 mapping = []
 # broadcast a transformation
@@ -69,16 +70,19 @@ def add_noise_to_transformation(transformation):
     return transformation
 
 # reads TF from simulation and updates TF
-def update_tf(tf_buffer, tf_broadcaster, bot_count, locSystemName, loc_system_rotation_angle):
+def update_tf(tf_buffer, tf_broadcaster, bot_count, locSystemName, loc_system_rotation_angle, model_state_proxy):
         for id in range(bot_count): #0,1,2,..N-1
-            try: #get tf from loc_system_locSytemName -> World -> .. -> tb3_id/base_footprint
-                #print("Lookup: " +  "loc_system_" + locSystemName + " --> " + 'tb3_' + str(id) + '/base_footprint')
-                transform_msg = tf_buffer.lookup_transform("loc_system_" + locSystemName, 'tb3_' + str(id+1) + '/base_footprint', rospy.Time(0))
-            except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
-                continue #if not possible try next
+            model_state = model_state_proxy('tb3_' + str(id+1), '')
+
+            if not model_state.success:
+                continue
+
+            transform = Transform()
+            transform.translation = model_state.pose.position
+            transform.rotation = model_state.pose.orientation
 
             #scale and add nose to the data
-            transformation_with_noise = add_noise_to_transformation(scale_transformation(transform_msg.transform))
+            transformation_with_noise = add_noise_to_transformation(scale_transformation(transform))
 
             #TF: loc_system -> target
             broadcast_tf(tf_broadcaster, "loc_system_" + locSystemName,
@@ -151,12 +155,16 @@ if __name__ == '__main__':
     #generate target mapping (random/correct)
     mapping = genMapping(bot_count, meta_correct_mapping)
 
+    rospy.wait_for_service('/gazebo/get_model_state')
+    get_model_state = rospy.ServiceProxy('/gazebo/get_model_state',
+                                         GetModelState)
+
     rate = rospy.Rate(update_rate) #Hz
 
     #main loop:
     while not rospy.is_shutdown():
         #update tf
-        update_tf(tf_buffer, tf_broadcaster, bot_count, loc_system_name, loc_system_rotation_angle)
+        update_tf(tf_buffer, tf_broadcaster, bot_count, loc_system_name, loc_system_rotation_angle, get_model_state)
         #update meta topic
         publish_metadata(meta_has_orientation, meta_correct_mapping, meta_accuracy)
         rate.sleep()

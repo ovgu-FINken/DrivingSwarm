@@ -88,10 +88,10 @@ def update_tf(bot_count):
         print(rotation_angle)
         print("#")
         
-        #publish world -> map tf
-        #q = quaternion_from_euler(0, 0, rotation_angle)
-        #broadcast_tf(tf_broadcaster, 'world', "map",
-        #            (create_transform_msg((translationX, translationY, 0), (q[0], q[1], q[2], q[3]))))
+        # publish world -> map tf
+        q = quaternion_from_euler(0, 0, rotation_angle)
+        broadcast_tf(tf_broadcaster, 'world', "map",
+                    (create_transform_msg((translationX, translationY, 0), (q[0], q[1], q[2], q[3]))))
 
 if __name__ == '__main__':
     rospy.init_node("transform_correlator_AMCL2Cam")
