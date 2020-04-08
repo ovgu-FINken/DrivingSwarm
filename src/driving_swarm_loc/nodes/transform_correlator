@@ -27,7 +27,7 @@ def correlate_frames(frames_source, frames_target, tfbuffer):
         for f_target in frames_target:
             try:
                 f_source_to_f_target = tfBuffer.lookup_transform(f_source, f_target, rospy.Time())
-            except tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException:
+            except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
                 continue
             trans = f_source_to_f_target.transform.translation
             error = trans.x ** 2 + trans.y ** 2
