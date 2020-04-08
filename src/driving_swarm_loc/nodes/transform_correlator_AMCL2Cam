@@ -49,9 +49,10 @@ def calc_translation(transform_msgs1, transform_msgs2):
     print("Mean2: y:" + str (mean2X) + "," + str(mean2Y))
     return mean1X - mean2X, mean1Y - mean2Y #world -> map
 
-def find_rotation(transform_msgs1, transform_msgs2, translationX, translationY):
+def find_rotation(transform_msgs1, transform_msgs2):
     
-    world_mean_x, world_mean_y = calc_mean_point(transform_msgs1)
+    world_mean_x1, world_mean_y1 = calc_mean_point(transform_msgs1)
+    world_mean_x2, world_mean_y2 = calc_mean_point(transform_msgs2)
     distance_min = 10**15 +0.1
     angle_min_distance = 10.0
     for angle in range(360):
@@ -63,10 +64,10 @@ def find_rotation(transform_msgs1, transform_msgs2, translationX, translationY):
 
         for i in range(len(transform_msgs1)):
             #add translation
-            mapX = transform_msgs2[i].transform.translation.x - translationX - world_mean_x
-            mapY = transform_msgs2[i].transform.translation.y - translationY - world_mean_y
-            worldX = transform_msgs1[i].transform.translation.x - world_mean_x
-            worldY = transform_msgs1[i].transform.translation.y - world_mean_y
+            mapX = transform_msgs2[i].transform.translation.x - world_mean_x2
+            mapY = transform_msgs2[i].transform.translation.y - world_mean_y2
+            worldX = transform_msgs1[i].transform.translation.x - world_mean_x1
+            worldY = transform_msgs1[i].transform.translation.y - world_mean_y1
 
             mapX, mapY =  R.dot([mapX, mapY])
             sum_distances += distance(worldX, mapX, worldY, mapY)
@@ -105,7 +106,7 @@ def update_tf(bot_count):
         print(translationX)
         print(translationY)
 
-        rotation_angle = find_rotation(transforms_world_cam_tb, transforms_map_tbN_basefootprint, translationX, translationY)
+        rotation_angle = find_rotation(transforms_world_cam_tb, transforms_map_tbN_basefootprint)
         print(rotation_angle)
         print("#")
         
