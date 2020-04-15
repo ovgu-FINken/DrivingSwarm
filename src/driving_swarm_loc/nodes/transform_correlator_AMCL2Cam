@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 
+import math
 import rospy
 import tf2_ros
 import numpy as np
 import geometry_msgs.msg
+from tf.transformations import quaternion_from_euler
 from geometry_msgs.msg import Vector3, Quaternion, Transform
+from pycpd import rigid_registration
 
 
 def lookup_transforms(tf_from, tf_to, bot_count):
@@ -100,6 +103,19 @@ def broadcast_tf(tf_broadcaster, parent, child, transform):
     tf_broadcaster.sendTransform(t)
 
 
+def find_transform(transform_msg1, transform_msg2):
+    coords_1 = [[msg.transform.translation.x,
+                 msg.transform.translation.y] for msg in transform_msg1]
+    coords_2 = [[msg.transform.translation.x,
+                 msg.transform.translation.y] for msg in transform_msg2]
+    X = np.array(coords_1)
+    Y = np.array(coords_2)
+
+    reg = rigid_registration(**{'X': X, 'Y': Y})
+    TY, (s_reg, R_reg, t_reg) = reg.register()
+    return R_reg, t_reg
+
+
 def update_tf(bot_count):
 
     transforms_world_cam_tb = lookup_transforms(
@@ -117,23 +133,27 @@ def update_tf(bot_count):
             == len(transforms_world_cam_tb):  # same size
 
         # translation
-        translationX, translationY = calc_translation(
-                                         transforms_world_cam_tb,
-                                         transforms_map_tbN_basefootprint)
-        print(translationX)
-        print(translationY)
+        # translationX, translationY = calc_translation(
+        #                                  transforms_world_cam_tb,
+        #                                  transforms_map_tbN_basefootprint)
+        # print(translationX)
+        # print(translationY)
 
-        rotation_angle = find_rotation(transforms_world_cam_tb,
-                                       transforms_map_tbN_basefootprint)
-        print(rotation_angle)
-        print("#")
+        # rotation_angle = find_rotation(transforms_world_cam_tb,
+        #                                transforms_map_tbN_basefootprint)
+        # print(rotation_angle)
+        # print("#")
 
         # publish world -> map tf
-        # q = quaternion_from_euler(0, 0, rotation_angle)
-        # broadcast_tf(tf_broadcaster, 'world', "map",
-        #             (create_transform_msg((translationX, translationY, 0), (q[0], q[1], q[2], q[3]))))
 
-        return translationX, translationY, rotation_angle
+        rotation, translation = find_transform(transforms_world_cam_tb,
+                                               transforms_map_tbN_basefootprint)
+
+        rotation_angle = math.asin(rotation[0][0])
+
+        q = quaternion_from_euler(0, 0, rotation_angle)
+        broadcast_tf(tf_broadcaster, 'world', "map",
+                    (create_transform_msg((translation[0], translation[1], 0), q)))
 
 
 if __name__ == '__main__':
