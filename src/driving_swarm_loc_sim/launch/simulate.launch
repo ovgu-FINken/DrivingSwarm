@@ -15,9 +15,9 @@
   <include file="$(find driving_swarm_fake_localisation)/launch/fake_localisation.launch">
     <arg name="loc_system_name" value="fake_UWB" />
     <arg name="bot_count" value="$(arg robot_amount)" />
-    <arg name="target_additive_noise_translation_sigma" value="0.2"/>
+    <arg name="target_additive_noise_translation_sigma" value="0.1"/>
     <arg name="meta_correct_mapping" value="true" />
-    <arg name="update_rate" value="3" />
+    <arg name="update_rate" value="6" />
     <arg name="meta_accuracy" value="0.8" />
   </include>
 
