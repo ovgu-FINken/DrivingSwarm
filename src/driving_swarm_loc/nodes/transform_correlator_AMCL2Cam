@@ -34,61 +34,6 @@ def lookup_transform_withoutExeption(tf_from, tf_to):
     return transform_msg
 
 
-def calc_mean_point(transform_msgs):
-    sumX = 0
-    sumY = 0
-    iterations = 0
-    for msg in transform_msgs:
-        sumX += msg.transform.translation.x
-        sumY += msg.transform.translation.y
-        iterations += 1
-    return sumX/iterations, sumY/iterations
-
-
-def calc_translation(transform_msgs1, transform_msgs2):
-    # 1: world
-    # 2: amcl
-    mean1X, mean1Y = calc_mean_point(transform_msgs1)
-    mean2X, mean2Y = calc_mean_point(transform_msgs2)
-    print("Mean1: x:" + str(mean1X) + "," + str(mean1Y))
-    print("Mean2: y:" + str(mean2X) + "," + str(mean2Y))
-    return mean1X - mean2X, mean1Y - mean2Y  #world -> map
-
-
-def find_rotation(transform_msgs1, transform_msgs2):
-
-    world_mean_x1, world_mean_y1 = calc_mean_point(transform_msgs1)
-    world_mean_x2, world_mean_y2 = calc_mean_point(transform_msgs2)
-    distance_min = 10**15 + 0.1
-    angle_min_distance = 10.0
-    for angle in range(360):
-        sum_distances = 0
-
-        theta = np.radians(angle)
-        c, s = np.cos(theta), np.sin(theta)
-        R = np.array(((c, -s), (s, c)))
-
-        for i in range(len(transform_msgs1)):
-            # add translation
-            mapX = transform_msgs2[i].transform.translation.x - world_mean_x2
-            mapY = transform_msgs2[i].transform.translation.y - world_mean_y2
-            worldX = transform_msgs1[i].transform.translation.x - world_mean_x1
-            worldY = transform_msgs1[i].transform.translation.y - world_mean_y1
-
-            mapX, mapY = R.dot([mapX, mapY])
-            sum_distances += distance(worldX, mapX, worldY, mapY)
-
-        if sum_distances < distance_min:
-            distance_min = sum_distances
-            angle_min_distance = angle
-
-    return angle_min_distance
-
-
-def distance(x1, x2, y1, y2):
-    return (x1 - x2)**2 + (y1 - y2)**2
-
-
 def create_transform_msg((x,y,z),(qx,qy,qz,qw)):
     t = Transform(Vector3(x, y, z), Quaternion(qx, qy, qz, qw))
     return t
@@ -132,24 +77,10 @@ def update_tf(bot_count):
             len(transforms_map_tbN_basefootprint) \
             == len(transforms_world_cam_tb):  # same size
 
-        # translation
-        # translationX, translationY = calc_translation(
-        #                                  transforms_world_cam_tb,
-        #                                  transforms_map_tbN_basefootprint)
-        # print(translationX)
-        # print(translationY)
-
-        # rotation_angle = find_rotation(transforms_world_cam_tb,
-        #                                transforms_map_tbN_basefootprint)
-        # print(rotation_angle)
-        # print("#")
-
-        # publish world -> map tf
-
         rotation, translation = find_transform(transforms_world_cam_tb,
                                                transforms_map_tbN_basefootprint)
 
-        rotation_angle = math.asin(rotation[0][0])
+        rotation_angle = math.acos(rotation[0][0])
 
         q = quaternion_from_euler(0, 0, rotation_angle)
         broadcast_tf(tf_broadcaster, 'world', "map",
