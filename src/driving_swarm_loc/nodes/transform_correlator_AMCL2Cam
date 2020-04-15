@@ -1,90 +1,44 @@
 #!/usr/bin/env python
 
-import rospy
-import tf_conversions
-from tf.transformations import quaternion_from_euler, euler_from_quaternion
-import tf2_ros
-import geometry_msgs.msg
-from std_msgs.msg import Int8, Int32, Float64
-import numpy as np
-import sys
-from geometry_msgs.msg import Vector3, Quaternion, Transform, TransformStamped
-from driving_swarm_msgs.msg import localisation_meta
 import math
+import rospy
+import tf2_ros
+import numpy as np
+import geometry_msgs.msg
+from tf.transformations import quaternion_from_euler
+from geometry_msgs.msg import Vector3, Quaternion, Transform
+from pycpd import rigid_registration
+
 
 def lookup_transforms(tf_from, tf_to, bot_count):
-    replaceString = '##' # use '##' as placeholder for the bot-id
+    replace_string = '##'  # use '##' as placeholder for the bot-id
     result = []
-    for id in range(bot_count): #0,1,2,..N-1
-        tf_to_inserted_id = tf_to.replace(replaceString, str(id+1))
-        tf_from_inserted_id = tf_from.replace(replaceString, str(id+1))
-        transformation_msg = lookup_transform_withoutExeption(tf_from_inserted_id, tf_to_inserted_id)
+    for id in range(bot_count):  # 0,1,2,..N-1
+        tf_to_inserted_id = tf_to.replace(replace_string, str(id+1))
+        tf_from_inserted_id = tf_from.replace(replace_string, str(id+1))
+        transformation_msg = lookup_transform_withoutExeption(
+            tf_from_inserted_id, tf_to_inserted_id)
         if transformation_msg:
             result.append(transformation_msg)
     return result
 
+
 def lookup_transform_withoutExeption(tf_from, tf_to):
-    try: transform_msg = tf_buffer.lookup_transform(tf_from, tf_to, rospy.Time(0))
+    try:
+        transform_msg = tf_buffer.lookup_transform(tf_from,
+                                                   tf_to,
+                                                   rospy.Time(0))
     except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
         print("No Translation found from '" + tf_from + "' to '" + tf_to + "'")
         return
-    return transform_msg    
-    
-def calc_mean_point(transform_msgs):
-    sumX = 0
-    sumY = 0
-    iterations = 0
-    for msg in transform_msgs:
-        sumX += msg.transform.translation.x
-        sumY += msg.transform.translation.y 
-        iterations += 1
-    return sumX/iterations, sumY/iterations
+    return transform_msg
 
-def calc_translation(transform_msgs1, transform_msgs2):
-    #1: world
-    #2: amcl
-    mean1X, mean1Y = calc_mean_point(transform_msgs1)
-    mean2X, mean2Y = calc_mean_point(transform_msgs2)
-    print("Mean1: x:" + str (mean1X) + "," + str(mean1Y))
-    print("Mean2: y:" + str (mean2X) + "," + str(mean2Y))
-    return mean1X - mean2X, mean1Y - mean2Y #world -> map
-
-def find_rotation(transform_msgs1, transform_msgs2):
-    
-    world_mean_x1, world_mean_y1 = calc_mean_point(transform_msgs1)
-    world_mean_x2, world_mean_y2 = calc_mean_point(transform_msgs2)
-    distance_min = 10**15 +0.1
-    angle_min_distance = 10.0
-    for angle in range(360):
-        sum_distances = 0
-
-        theta = np.radians(angle)
-        c, s = np.cos(theta), np.sin(theta)
-        R = np.array(((c, -s), (s, c)))    
-
-        for i in range(len(transform_msgs1)):
-            #add translation
-            mapX = transform_msgs2[i].transform.translation.x - world_mean_x2
-            mapY = transform_msgs2[i].transform.translation.y - world_mean_y2
-            worldX = transform_msgs1[i].transform.translation.x - world_mean_x1
-            worldY = transform_msgs1[i].transform.translation.y - world_mean_y1
-
-            mapX, mapY =  R.dot([mapX, mapY])
-            sum_distances += distance(worldX, mapX, worldY, mapY)
-
-        if sum_distances < distance_min:
-            distance_min = sum_distances
-            angle_min_distance = angle
-
-    return angle_min_distance;
-
-def distance(x1, x2, y1, y2):
-    return (x1 - x2)**2 + (y1 - y2)**2
 
 def create_transform_msg((x,y,z),(qx,qy,qz,qw)):
-    t = Transform(Vector3(x,y,z), Quaternion(qx,qy,qz,qw))
+    t = Transform(Vector3(x, y, z), Quaternion(qx, qy, qz, qw))
     return t
-    
+
+
 def broadcast_tf(tf_broadcaster, parent, child, transform):
     t = geometry_msgs.msg.TransformStamped()
     t.header.stamp = rospy.Time.now()
@@ -93,42 +47,60 @@ def broadcast_tf(tf_broadcaster, parent, child, transform):
     t.transform = transform
     tf_broadcaster.sendTransform(t)
 
+
+def find_transform(transform_msg1, transform_msg2):
+    coords_1 = [[msg.transform.translation.x,
+                 msg.transform.translation.y] for msg in transform_msg1]
+    coords_2 = [[msg.transform.translation.x,
+                 msg.transform.translation.y] for msg in transform_msg2]
+    X = np.array(coords_1)
+    Y = np.array(coords_2)
+
+    reg = rigid_registration(**{'X': X, 'Y': Y})
+    TY, (s_reg, R_reg, t_reg) = reg.register()
+    return R_reg, t_reg
+
+
 def update_tf(bot_count):
-   
-    transforms_world_cam_tb = lookup_transforms("world", "loc_system_fake_camera/tb3_##", bot_count)
-    transforms_map_tbN_basefootprint = lookup_transforms("map", "tb3_##/base_footprint", bot_count)
 
+    transforms_world_cam_tb = lookup_transforms(
+                                        "world",
+                                        "loc_system_fake_camera/tb3_##",
+                                        bot_count)
+    transforms_map_tbN_basefootprint = lookup_transforms(
+                                        "map",
+                                        "tb3_##/base_footprint",
+                                        bot_count)
 
-    if transforms_world_cam_tb and transforms_map_tbN_basefootprint and len(transforms_map_tbN_basefootprint) == len(transforms_world_cam_tb): #same size
+    if transforms_world_cam_tb and \
+            transforms_map_tbN_basefootprint and \
+            len(transforms_map_tbN_basefootprint) \
+            == len(transforms_world_cam_tb):  # same size
 
-        #translation
-        translationX, translationY = calc_translation(transforms_world_cam_tb, transforms_map_tbN_basefootprint)
-        print(translationX)
-        print(translationY)
+        rotation, translation = find_transform(transforms_world_cam_tb,
+                                               transforms_map_tbN_basefootprint)
 
-        rotation_angle = find_rotation(transforms_world_cam_tb, transforms_map_tbN_basefootprint)
-        print(rotation_angle)
-        print("#")
-        
-        # publish world -> map tf
+        rotation_angle = math.acos(rotation[0][0])
+
         q = quaternion_from_euler(0, 0, rotation_angle)
         broadcast_tf(tf_broadcaster, 'world', "map",
-                    (create_transform_msg((translationX, translationY, 0), (q[0], q[1], q[2], q[3]))))
+                    (create_transform_msg((translation[0], translation[1], 0), q)))
+
 
 if __name__ == '__main__':
     rospy.init_node("transform_correlator_AMCL2Cam")
 
     bot_count = rospy.get_param('~bot_count')
-    #create tf buffer
+    # create tf buffer
     tf_buffer = tf2_ros.Buffer()
     tf2_ros.TransformListener(tf_buffer)
 
-    #create tf broadcaster
+    # create tf broadcaster
     tf_broadcaster = tf2_ros.TransformBroadcaster()
 
-    rate = rospy.Rate(1) #Hz
+    rate = rospy.Rate(5)  # Hz
 
-    #main loop:
+    # main loop:
     while not rospy.is_shutdown():
         update_tf(bot_count)
         rate.sleep()
