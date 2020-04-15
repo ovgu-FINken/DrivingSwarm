@@ -9,6 +9,7 @@
     name="map_server"
     type="map_server"
     args="$(arg map_path)">
+  <param name="frame_id" value="map" />
   </node>
 
 
