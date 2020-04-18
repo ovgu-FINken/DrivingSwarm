@@ -13,7 +13,7 @@
   </node>
 
 
-  <include file="$(find driving_swarm_fake_localisation)/launch/fake_localisation.launch">
+  <include file="$(find driving_swarm_loc_sim)/launch/fake_localisation.launch">
     <arg name="loc_system_name" value="fake_UWB" />
     <arg name="bot_count" value="$(arg robot_amount)" />
     <arg name="target_additive_noise_translation_sigma" value="0.1"/>
@@ -22,7 +22,7 @@
     <arg name="meta_accuracy" value="0.8" />
   </include>
 
-  <include file="$(find driving_swarm_fake_localisation)/launch/fake_localisation.launch">
+  <include file="$(find driving_swarm_loc_sim)/launch/fake_localisation.launch">
     <arg name="loc_system_name" value="fake_camera" />
     <arg name="bot_count" value="$(arg robot_amount)" />
   </include>
@@ -65,8 +65,10 @@
     <arg name="auto_drive" value="$(arg auto_drive)"/>
   </include>
 
-  <include file="$(find driving_swarm_fake_localisation)/launch/fakeUwbTurtlebotAssing.launch">
+  <include file="$(find driving_swarm_loc_sim)/launch/fake_turtlebot_assign.launch">
     <arg name="bot_count" value="$(arg robot_amount)" />
+    <arg name="update_rate" value="1.0"/>
+    <arg name="uwb_tf_prefix" value="loc_system_fake_UWB/"/>
   </include>
 
 </launch>

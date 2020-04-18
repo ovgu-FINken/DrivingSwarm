@@ -8,12 +8,19 @@
   <license>TODO</license>
   <buildtool_depend>catkin</buildtool_depend>
 
-  <depend>map_server</depend>
+  <depend>amcl</depend>
   <depend>driving_swarm_fake_localisation</depend>
   <depend>driving_swarm_loc</depend>
-  <depend>amcl</depend>
-  <depend>turtlebot3_bringup</depend>
+  <depend>driving_swarm_msgs</depend>
+  <depend>gazebo_msgs</depend>
   <depend>gazebo_ros</depend>
+  <depend>geometry_msgs</depend>
+  <depend>map_server</depend>
+  <depend>turtlebot3_bringup</depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>tf2</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>python-numpy</exec_depend>
 
   <export>
     <gazebo_ros gazebo_media_path="${prefix}" gazebo_model_path="${prefix}/models"/>
