@@ -47,3 +47,13 @@ sources:
   repo: git@github.com:ovgu-FINken/driving_swarm_pheromones.git
   rev: master
   link: src/driving_swarm_pheromones
+
+- name: usb_cam
+  repo: https://github.com/ros-drivers/usb_cam.git
+  rev: develop
+  link: src/usb_cam
+
+- name: whycon
+  repo: git@github.com:ovgu-FINken/WhyCon_Ros.git
+  rev: multi
+  link: src/whycon
