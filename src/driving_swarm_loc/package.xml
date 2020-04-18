@@ -5,11 +5,19 @@
   <description>The driving_swarm_loc package</description>
 
   <license>TODO</license>
-  <maintainer email="nico@todo.todo">nico</maintainer>
+  <maintainer email="swarmlab@todo.todo">swarmlab</maintainer>
 
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <depend>geometry_msgs</depend>
+  <depend>driving_swarm_msgs</depend>
+
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>tf</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>python-yaml</exec_depend>
+  <exec_depend>python-numpy</exec_depend>
 
   <export>
     <!-- Other tools can request additional information be placed here -->

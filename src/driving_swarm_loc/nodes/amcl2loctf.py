@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 import rospy
-import tf_conversions
-from tf.transformations import quaternion_from_euler, euler_from_quaternion
+from tf.transformations import quaternion_from_euler
 import tf2_ros
-import geometry_msgs.msg
-from std_msgs.msg import Int8, Int32, Float64
-import numpy as np
-import sys
 from geometry_msgs.msg import Vector3, Quaternion, Transform, TransformStamped
 from driving_swarm_msgs.msg import localisation_meta
 

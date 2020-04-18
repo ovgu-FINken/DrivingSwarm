@@ -3,10 +3,17 @@
   <name>driving_swarm_loc_sim</name>
   <version>0.0.0</version>
   <description>The driving_swarm_loc_sim package</description>
-  <maintainer email="nico@todo.todo">nico</maintainer>
+  <maintainer email="swarmlab@todo.todo">swarmlab</maintainer>
 
   <license>TODO</license>
   <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>map_server</depend>
+  <depend>driving_swarm_fake_localisation</depend>
+  <depend>driving_swarm_loc</depend>
+  <depend>amcl</depend>
+  <depend>turtlebot3_bringup</depend>
+  <depend>gazebo_ros</depend>
 
   <export>
     <gazebo_ros gazebo_media_path="${prefix}" gazebo_model_path="${prefix}/models"/>
