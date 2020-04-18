@@ -1,6 +1,6 @@
   <launch>
     <arg name="bot_count" default="1"/>
-    <node name="driving_swarm_amcl2loctf" pkg="driving_swarm_loc" type="amcl2loctf.py" args="" respawn="false" output="screen">
+    <node name="driving_swarm_amcl2loctf" pkg="driving_swarm_loc" type="amcl2loctf" args="" respawn="false" output="screen">
       <param name="bot_count" type="int" value="$(arg bot_count)"/>
     </node>
   </launch>

@@ -27,7 +27,7 @@
     <arg name="bot_count" value="$(arg robot_amount)" />
   </include>
 
-  <node name="driving_swarm_combined_output" pkg="driving_swarm_loc" type="combined_output.py" args="" respawn="false" output="screen">
+  <node name="driving_swarm_combined_output" pkg="driving_swarm_loc" type="combined_output" args="" respawn="false" output="screen">
     <rosparam param="loc_systems">
         {
          loc_system_fake_UWB: {weight: 0.3},

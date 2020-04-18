@@ -63,5 +63,7 @@ src/turtlebot3_simulations
 src/tracking_uncertainty_grid
 src/driving_swarm_positioning
 src/driving_swarm_pheromones
+src/whycon
+src/usb_cam
 firstrun.sh
 
