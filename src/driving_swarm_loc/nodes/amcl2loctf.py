@@ -10,7 +10,7 @@ def create_transform_msg((x,y,z),(qx,qy,qz,qw)):
     return t
 
 def broadcast_tf(tf_broadcaster, parent, child, transform):
-        t = geometry_msgs.msg.TransformStamped()
+        t = TransformStamped()
         t.header.stamp = rospy.Time.now()
         t.header.frame_id = parent
         t.child_frame_id = child
