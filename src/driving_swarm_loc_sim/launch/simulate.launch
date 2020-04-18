@@ -37,17 +37,17 @@
     </rosparam>
   </node>
 
-  <include file="$(find driving_swarm_loc)/launch/amcl2loctf.launch">
+  <include file="$(find driving_swarm_loc)/launch/convert_amcl_tf_tree.launch">
     <arg name="bot_count" value="$(arg robot_amount)" />
   </include>
 
 
-  <node pkg="driving_swarm_loc" type="transform_correlator" name="transform_correlator" output="screen">
+  <node pkg="driving_swarm_loc" type="assign_turtle_ids" name="assign_turtle_ids" output="screen">
     <param name="loc_system_source" value="loc_system_fake_UWB"/>
     <param name="loc_system_target" value="loc_system_fake_camera"/>
   </node>
 
-  <node pkg="driving_swarm_loc" type="transform_correlator_AMCL2Cam" name="transform_correlator_AMCL2CAM" output="screen">
+  <node pkg="driving_swarm_loc" type="find_map_to_world_transform" name="find_map_to_world_transform" output="screen">
     <param name="bot_count" value="$(arg robot_amount)"/>
   </node>
 
