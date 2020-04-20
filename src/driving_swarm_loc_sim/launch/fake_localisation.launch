@@ -11,8 +11,6 @@
     <arg name="target_additive_noise_translation_sigma" default="0"/>
     <arg name="target_multiplicative_noise_rotation_sigma" default="0"/>
     <arg name="target_additive_noise_rotation_sigma" default="0"/>
-    <arg name="target_scale_x" default="1"/>
-    <arg name="target_scale_y" default="1"/>
 
     <arg name="update_rate" default="100.0"/>
 
@@ -33,8 +31,6 @@
       <param name="target_additive_noise_translation_sigma" type="double" value="$(arg target_additive_noise_translation_sigma)"/>
       <param name="target_multiplicative_noise_rotation_sigma" type="double" value="$(arg target_multiplicative_noise_rotation_sigma)"/>
       <param name="target_additive_noise_rotation_sigma" type="double" value="$(arg target_additive_noise_rotation_sigma)"/>
-      <param name="target_scale_x" type="double" value="$(arg target_scale_x)"/>
-      <param name="target_scale_y" type="double" value="$(arg target_scale_y)"/>
 
       <param name="update_rate" type="double" value="$(arg update_rate)"/>
 

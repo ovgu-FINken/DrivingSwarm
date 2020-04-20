@@ -30,8 +30,8 @@ def sample_normal_distribution(mu, sigma):
 
 # returns a scaled transformation
 def scale_transformation(transformation):
-    transformation.translation.x *= target_scale_x;
-    transformation.translation.y *= target_scale_y;
+    transformation.translation.x *= loc_system_scale_x;
+    transformation.translation.y *= loc_system_scale_y;
     return transformation
 
 # returns a transformation with added noise.
@@ -131,8 +131,6 @@ if __name__ == '__main__':
     target_random_additive_noise_translation_sigma = rospy.get_param('~target_additive_noise_translation_sigma')
     target_random_multiplicative_noise_rotation_sigma = rospy.get_param('~target_multiplicative_noise_rotation_sigma')
     target_random_additive_noise_rotation_sigma = rospy.get_param('~target_additive_noise_rotation_sigma')
-    target_scale_x = rospy.get_param('~target_scale_x')
-    target_scale_y = rospy.get_param('~target_scale_y')
 
     update_rate = rospy.get_param('~update_rate')
 
