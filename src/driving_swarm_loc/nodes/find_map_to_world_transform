@@ -56,7 +56,7 @@ def find_transform(transform_msg1, transform_msg2):
     X = np.array(coords_1)
     Y = np.array(coords_2)
 
-    reg = rigid_registration(**{'X': X, 'Y': Y})
+    reg = rigid_registration.RigidRegistration(**{'X': X, 'Y': Y})
     TY, (s_reg, R_reg, t_reg) = reg.register()
     return R_reg, t_reg
 
