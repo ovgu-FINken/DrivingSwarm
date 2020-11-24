@@ -4,11 +4,12 @@
 	<!-- No group - launch with ROS_NAMESPACE / launch-file -->
 
 	<arg name="multi_robot_name" default="$(env ROS_HOSTNAME)"/>
-	<arg name="map_file" default="$(find core)/maps/world.yaml"/>
+	<arg name="map_file" default="$(find core)/maps/arena_empty.yaml"/>
 
 	<!-- Static map_server -->
 	<node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
+		<remap from="/clock" to="/$(arg multi_robot_name)/clock"/>
 		<param name="~frame_id" value="$(arg multi_robot_name)/map"/>
-	</node>
+	</node>	
 
 </launch>

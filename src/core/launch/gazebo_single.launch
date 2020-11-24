@@ -1,50 +1,63 @@
 <?xml version="1.0"?>
 <launch>
-	<arg name="multi_robot_name" default="bookturtle1"/>
-	<arg name="model" default="burger" doc="model type [burger]"/>
 
-	<arg name="x_pos" default="-2.0"/>
-	<arg name="y_pos" default="-0.5"/>
-	<arg name="z_pos" default="0.0"/>
+<arg name="multi_robot_name" default="bookturtle1"/>
+<arg name="model" default="burger" doc="model type [burger]"/>
 
-	<arg name="world_file" default="$(find turtlebot3_gazebo)/worlds/turtlebot3_world.world"/>
+<arg name="x_pos" default="0.5"/>
+<arg name="y_pos" default="0.0"/>
+<arg name="z_pos" default="0.0"/>
 
-	<arg name="gazebo_port" default="11355"/>
+<arg name="world_file" default="$(find turtlebot3_gazebo)/worlds/turtlebot3_world.world"/>
 
-	<arg name="gui" default="true"/>
-	<arg name="use_sim_time" default="false"/>
+<arg name="gazebo_port" default="11355"/>
+
+<arg name="gui" default="true"/>
+<arg name="use_sim_time" default="false"/>
 
 	<env name="GAZEBO_MASTER_URI" value="http://localhost:$(arg gazebo_port)"/>
 	<remap from="/clock" to="/$(arg multi_robot_name)/clock"/>
 
-	<group ns="$(arg multi_robot_name)">
+<group ns="$(arg multi_robot_name)">
 
-		<include file="$(find gazebo_ros)/launch/empty_world.launch">
-			<arg name="world_name" value="$(arg world_file)"/>
-			<arg name="paused" value="false"/>
-			<arg name="use_sim_time" value="$(arg use_sim_time)"/>
-			<arg name="gui" value="$(arg gui)"/>
-			<arg name="headless" value="false"/>
-			<arg name="debug" value="false"/>
-		</include>
-
-		<param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
-
-		<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
-			<param name="publish_frequency" type="double" value="50.0" />
-			<param name="tf_prefix" value="$(arg multi_robot_name)" />
+	<group unless="$(arg use_sim_time)">
+		<node pkg="core" type="re_publisher.py" name="re_publisher">
+			<param name="list_sub_topics" value="/$(arg multi_robot_name)/scan_gazebo"/>
+			<param name="list_pub_topics" value="/$(arg multi_robot_name)/scan"/>
+			<param name="list_message_types" value="LaserScan"/>
 		</node>
-
-		<node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf"  args="-urdf -model turtlebot3_$(arg model) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -param robot_description -gazebo_namespace /$(arg multi_robot_name)/gazebo -robot_namespace /$(arg multi_robot_name)"/>
-
-
-		<!-- ADD YOUR GAZEBO_LAUNCHFILES FOR EVERY BOT HERE-->
-		<!--include file="$(find core)/launch/turtlebot_slam.launch"-->
-			<!--arg name="multi_robot_name" value="$(arg multi_robot_name)"/-->
-		<!--/include-->
-		<!--include file="$(find core)/launch/turtlebot_move.launch"-->
-			<!--arg name="multi_robot_name" value="$(arg multi_robot_name)"/-->
-		<!--/include-->
-
 	</group>
+
+	<remap unless="$(arg use_sim_time)" from="/$(arg multi_robot_name)/scan" to="/$(arg multi_robot_name)/scan_gazebo"/>
+
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+		<arg name="world_name" value="$(arg world_file)"/>
+		<arg name="paused" value="false"/>
+		<arg name="use_sim_time" value="$(arg use_sim_time)"/>
+		<arg name="gui" value="$(arg gui)"/>
+		<arg name="debug" value="false"/>
+	</include>
+
+	<param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+
+	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+		<param name="publish_frequency" type="double" value="50.0" />
+		<param name="tf_prefix" value="$(arg multi_robot_name)" />
+	</node>
+
+	<node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf"  args="-urdf -model turtlebot3_$(arg model) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -param robot_description -gazebo_namespace /$(arg multi_robot_name)/gazebo -robot_namespace /$(arg multi_robot_name)"/>
+
+
+	<!-- ADD YOUR GAZEBO_LAUNCHFILES FOR EVERY BOT HERE-->
+	<!--include file="$(find core)/launch/turtlebot_slam.launch"-->
+		<!--arg name="multi_robot_name" value="$(arg multi_robot_name)"/-->
+		<!--arg name="cartographer_config_file" value="turtlebot3_lds_2d_gazebo.lua"/-->
+		<!--arg name="slam_method" value="hector"/-->
+	<!--/include-->
+	<!--include file="$(find core)/launch/turtlebot_move.launch"-->
+		<!--arg name="multi_robot_name" value="$(arg multi_robot_name)"/-->
+	<!--/include-->
+
+</group>
+
 </launch>

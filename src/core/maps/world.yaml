@@ -1,7 +1,0 @@
-image: /home/turtle/DrivingSwarm/src/core/maps/world.pgm
-resolution: 0.050000
-origin: [-0.945150, -1.128847, 0.000000]
-negate: 0
-occupied_thresh: 0.65
-free_thresh: 0.196
-
